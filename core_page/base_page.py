@@ -1,6 +1,7 @@
 import os
 from urllib.parse import urljoin
 
+from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -10,7 +11,7 @@ class BasePage:
     Базовый класс для взаимодействия с любой страницей.
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
-    def __init__(self, driver, window_size, url_suffix=''):
+    def __init__(self, driver=webdriver.Chrome(), window_size=(1920, 1080), url_suffix=''):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
         1. Указывает драйвер для последующей работы с selenium;

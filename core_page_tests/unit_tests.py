@@ -1,4 +1,4 @@
-from core_page.base_page import BasePage
+from core_page.core_page.base_page import BasePage
 
 import pytest
 from unittest.mock import Mock, patch
@@ -19,13 +19,13 @@ def test_init(base_page):
     assert base_page.driver is not None
     assert base_page.base_url == "https://test.com"
     assert base_page.url_suffix == "/test"
-    assert base_page.url == "https://test.com"
+    assert base_page.url == "https://test.com/test"
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
 
 
 def test_go_to_site(base_page):
     base_page.go_to_site()
-    base_page.driver.get.assert_called_once_with("https://expert.vk.com/test")
+    base_page.driver.get.assert_called_once_with("https://test.com/test")
 
 
 @patch.object(WebDriverWait, 'until')
