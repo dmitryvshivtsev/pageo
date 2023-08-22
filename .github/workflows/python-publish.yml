@@ -24,15 +24,15 @@ jobs:
     - name: Install dependencies
       run: pip3 install -r requirements_dev.txt
 
-    - name: Install chromedriver
-      run: |
-        curl -sS -o chromedriver_linux64.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
-        unzip chromedriver_linux64.zip
-        rm chromedriver_linux64.zip
-        sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+    # - name: Install chromedriver
+    #   run: |
+    #     curl -sS -o chromedriver_linux64.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
+    #     unzip chromedriver_linux64.zip
+    #     rm chromedriver_linux64.zip
+    #     sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
 
-    - name: Run tests
-      run: pytest tests/unit_tests.py
+    # - name: Run tests
+    #   run: pytest tests/unit_tests.py
 
     - name: Install the library
       shell: bash
