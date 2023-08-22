@@ -1,14 +1,12 @@
 from flask import Flask, render_template
 
 
-app = Flask(__name__)
+def run_flask():
+    app = Flask(__name__)
 
+    @app.route("/")
+    def root():
+        return render_template('index.html')
 
-@app.route("/")
-def root():
-    return render_template('index.html')
-
-
-if __name__ == '__main__':
     app.run(port=8000)
 
