@@ -11,7 +11,12 @@ class BasePage:
     Базовый класс для взаимодействия с любой страницей.
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
-    def __init__(self, driver=webdriver.Chrome(), window_size=(1920, 1080), url_suffix=''):
+    def __init__(self,
+                 driver=webdriver.Chrome(),
+                 base_url=os.environ.get('BASE_URL'),
+                 window_size=(1920, 1080),
+                 url_suffix=''
+                 ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
         1. Указывает драйвер для последующей работы с selenium;
@@ -22,7 +27,7 @@ class BasePage:
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
         self.driver = driver
-        self.base_url = os.environ.get('BASE_URL')
+        self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
         screen_width, screen_height = window_size

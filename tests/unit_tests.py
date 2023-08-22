@@ -7,25 +7,28 @@ from selenium.common import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 
 
+base_url_test = "https://test.com"
+
+
 @pytest.fixture
 def base_page():
     driver = Mock()
     url_suffix = "/test"
     window_size = (1920, 1080)
-    return BasePage(driver, window_size, url_suffix)
+    return BasePage(driver, base_url_test, window_size, url_suffix)
 
 
 def test_init(base_page):
     assert base_page.driver is not None
-    assert base_page.base_url == "https://test.com"
+    assert base_page.base_url == base_url_test
     assert base_page.url_suffix == "/test"
-    assert base_page.url == "https://test.com/test"
+    assert base_page.url == base_url_test + "/test"
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
 
 
 def test_go_to_site(base_page):
     base_page.go_to_site()
-    base_page.driver.get.assert_called_once_with("https://test.com/test")
+    base_page.driver.get.assert_called_once_with(base_page.url)
 
 
 @patch.object(WebDriverWait, 'until')
