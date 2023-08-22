@@ -1,0 +1,36 @@
+name: Upload Python Package
+
+on:
+  push
+
+permissions:
+  contents: read
+
+jobs:
+  build-n-publish:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+          python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r requirements_dev.txt
+
+    - name: Install the library
+      shell: bash
+      run: python setup.py install
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
