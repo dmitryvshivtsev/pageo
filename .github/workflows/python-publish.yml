@@ -3,11 +3,8 @@ name: Upload Python Package
 on:
   push
 
-permissions:
-  contents: read
-
 jobs:
-  build-n-publish:
+  build:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -33,8 +30,8 @@ jobs:
       shell: bash
       run: python3 setup.py install
 
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@release/v0.1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+    # - name: Publish package
+    #   uses: pypa/gh-action-pypi-publish@release/v0.1
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_API_TOKEN }}
