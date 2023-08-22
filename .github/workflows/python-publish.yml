@@ -26,7 +26,7 @@ jobs:
 
     - name: Install chromedriver
       run: |
-        curl -sS -o chromedriver_linux64.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
+        curl -sS -o chromedriver_linux64.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
         unzip chromedriver_linux64.zip
         rm chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
