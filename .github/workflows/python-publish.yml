@@ -27,7 +27,6 @@ jobs:
       run: pip3 install -r requirements_dev.txt
 
     - name: Run tests
-      shell: bash
       run: >-
         pytest tests/unit_tests.py
         pytest tests/functional_tests.py
