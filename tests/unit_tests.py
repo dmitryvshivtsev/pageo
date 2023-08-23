@@ -1,4 +1,4 @@
-from base_page.base_page.base_page import BasePage
+from core_page.base_page.base_page import BasePage
 
 import pytest
 from unittest.mock import Mock, patch
