@@ -1,7 +1,9 @@
 import os
+from typing import Callable
 from urllib.parse import urljoin
 
 from selenium import webdriver
+from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -12,21 +14,21 @@ class BasePage:
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
     def __init__(self,
-                 driver=webdriver.Chrome(),
-                 base_url=os.environ.get('BASE_URL'),
+                 base_url,
+                 driver_fabric=webdriver.Chrome,
                  window_size=(1920, 1080),
-                 url_suffix=''
+                 url_suffix='',
                  ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
         1. Указывает драйвер для последующей работы с selenium;
         2. Собирает url страницы, на которую нужно осуществить последующий переход;
         3. Устанавливает размер экрана страницы браузера.
-        :param driver: Selenium-драйвер. Используется для доступа к методам работы со страницей.
+        :param driver_fabric: Selenium-драйвер. Используется для доступа к методам работы со страницей.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
-        self.driver = driver
+        self.driver = driver_fabric()
         self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
@@ -60,3 +62,38 @@ class BasePage:
         Метод, для перехода на страницу сайта по заданному адресу.
         """
         self.driver.get(self.url)
+
+    def custom_wait_until(self, func_condition: Callable, duration=10):
+        """
+        Метод позволяет задавать ожидания на основе
+        пользовательских условий.
+
+        В случае, когда условие ожидания, которое нам нужно, не предусмотрено selenium, пользователь
+        может сам задать условие ожидания на основе какой-либо функции.
+
+        Например: lambda browser: len(browser.window_handles) != 2 задаст следующие условие ожидания: ждем пока
+        количество вкладок в браузере не станет равным двум.
+
+        :param func_condition: Функция предикат, в которой задано условие ожидания.
+        :param duration: Числовое значение в секундах, используемое для передачи его в явное ожидания.
+        """
+        WebDriverWait(self.driver, duration).until(func_condition)
+
+    def wait_until_url_is_not_changed(self):
+        """
+        Метод добавляет ожидание до тех пор, пока url не изменится.
+
+        В качестве применения ожидания метод использует базовый метод для добавления ожиданий
+        'custom_wait_until'.
+        """
+        self.custom_wait_until(lambda browser: browser.current_url != self.url)
+
+    def point_element(self, element):
+        """
+        Имитирует наведение на элемент, чтобы проверять
+        работу псевдо класса :hover.
+
+        :param element: Какой-либо WebElement.
+        """
+        action = ActionChains(self.driver)
+        action.move_to_element(element).perform()
