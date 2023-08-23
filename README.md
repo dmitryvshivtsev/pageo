@@ -1,8 +1,8 @@
-# core_page
+# core-page
 
 Библиотека для автоматической работы с любыми веб-страницами и их элементами на базе Selenium. 
 Вдохновлена статьёй на [Хабр](https://habr.com/ru/articles/472156/) и упрощает написание автоматических тестов 
-с реализацией паттерна PageObject. Ускорьте написание кода, а также сделайте его лаконичнее, яснее и гибче.
+с реализацией паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject). Ускорьте написание кода, а также сделайте его лаконичнее, яснее и гибче.
 
 ## Описание
 
@@ -12,7 +12,6 @@
 Библиотека позволяет скрыть часть логики, а также комбинирует различные инструменты в отдельные методы.
 Благодаря этому, ускоряется написание тестов, их понимание и последующая поддержка. 
 
-
 Преимущества перед использованием Selenium из коробки:
 - Простое использование, путем наследования от базового класса в классы конкретных страниц.
 - Возможность установить настройки для теста, просто передав их в аргументах класса.
@@ -20,41 +19,156 @@
 - Методы для получения аттрибутов у любого элемента. Просто передайте локатор.
 - Скачивание изображений и возможность их проверки.
 
+##  Оглавление
 
-## Примеры использования
+* [Быстрый старт](#быстрый-старт)
+* [Документация класса](#документация-класса)
+    * [Chromedriver](#chromedriver) 
+    * [Конструктор класса](#конструктор-класса)
+    * [Метод go_to_site](#метод-gotosite)
+    * [Метод find_element](#метод-findelement)
+    * [Метод find_elements](#метод-findelements)
+* [Использование в PageObject](#использование-в-pageobject)
 
-Например, на веб-сайте имеется главная страница, которая содержит различные элементы. Необходимо перейти на эту страницу 
-и проверить наличие заголовка на странице и его содержимое (текст заголовка).
-В таком случае, создается класс *MainPage* в файле `main_page.py` и наследуется от базового класса *BasePage*.
+
+## Быстрый старт:
+
+Установите core-page через pip:
+
+```shell
+pip install core-page
+```
+
+Далее, создаем файл для тестируемой страницы и импортируем класс BasePage.\
+Создаем класс и наследуемся от BasePage. Теперь нам доступны все [методы](#документация-класса) базового класса.
 
 ```python
 # main_page.py
 
-from e2e.core_page.base_page import BasePage
-
+from base_page.base_page import BasePage
 
 class MainPage(BasePage):
-    def check_title(self):
-        actual_title = self.find_element(locator).text
-        assert actual_title == expected_title
-```
-Метод `find_element()` определён в базовом классе и используется для поиска элемента. Если элемент найден, 
-то вызывается метод text для получения текста заголовка и проверяем его.
+    def get_title(self):
+        return self.find_element(locator).text
 
-Далее, создаем файл `test_main_page.py`, где описываем тест-кейс для тестирования этого сценария, используя PyTest:
+    ...
+```
+
+Далее, можем создать экземпляр нашего класса MainPage в тест-кейсе и передать необходимые [настройки](#конструктор-класса).
 
 ```python
 # test_main_page.py
 
-from e2e.page_objects import MainPage
+from page_objects import MainPage
 
 
 def test_main_page_title(driver):
-    page = MainPage(driver=driver, url_suffix='', window_size=(1920, 1080))
+    page = MainPage(driver=driver,
+                    base_url='https://example.com',
+                    url_suffix='',)
+    
     page.go_to_site()
-    page.check_title()
+    
+    ...
 ```
 
-Мы создаём экземпляр класса *MainPage* и передаём необходимые параметры. Далее, используем метод `go_to_site()` для 
-перехода на страницу, определенную в базовом классе. После чего, мы вызываем метод класса *MainPage*, который выполняет 
-необходимый сценарий тестирования.
+## Документация класса
+
+### Chromedriver
+
+Использование библиотеки подразумевает, что в вашем окружении уже установлен [chromedriver](https://chromedriver.chromium.org/getting-started).
+Если нет, то следует ознакомиться с [руководством](https://chromedriver.chromium.org/getting-started).
+
+### Конструктор класса
+
+Конструктор класса BasePage позволяет установить следующие настройки:
+- **driver - драйвер для работы браузером.** По умолчанию создаёт драйвер для Chrome, если не был передан иной драйвер;
+- **base_url - адрес страницы без относительного пути.** По умолчанию получает содержимое переменной 'BASE_URL' из окружения. 
+Если планируется работать лишь с одной страницей, то добавьте адрес страницы в окружение. 
+**Перед адресом страницы должен быть указан протокол!** \
+Пример: `https://google.com`
+- **window_size** - размер страницы браузера в формате `(высота, ширина)`. По умолчанию установлено значение (1920, 1080).
+- **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию относительный путь отсутствует.
+
+
+### Метод go_to_site
+
+Осуществляет переход по полному URL страницы (после объединения **base_url** и **url_suffix**). 
+Метод `go_to_site` ничего не принимает и не возвращает.
+
+```python
+from page_objects import MainPage
+
+
+def test_some_element():
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    
+    page.go_to_site()  # Переход на сайт https://google.com/doodles
+```
+
+### Метод find_element
+
+Метод `find_element` ищет элемент на странице по [локатору](https://www.selenium.dev/documentation/webdriver/elements/locators/) в течение определенного времени. Если элемент найден, то возвращает его.
+Иначе выбрасывает TimeoutException.
+
+Принимает следующие аргументы:
+- locator - [локатор](https://www.selenium.dev/documentation/webdriver/elements/locators/) элемента. Значения по умолчанию нет.
+- duration - время в секундах, в течение которого будет осуществляться поиск элемента. Значение по умолчанию - 5 секунд.
+
+```python
+from page_objects import MainPage
+
+
+def test_some_element():
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    
+    page.go_to_site()
+    element = page.find_element(locator, duration=10)
+```
+
+### Метод find_elements
+
+Метод `find_element` ищет все элементы на странице по [локатору](https://www.selenium.dev/documentation/webdriver/elements/locators/) 
+в течение определенного времени. Если элементы найдены, то возвращает список из этих элементов.
+Иначе выбрасывает TimeoutException.
+
+Принимает следующие аргументы:
+- locator - [локатор](https://www.selenium.dev/documentation/webdriver/elements/locators/) элементов. Значения по умолчанию нет.
+- duration - время в секундах, в течение которого будет осуществляться поиск элементов. Значение по умолчанию - 5 секунд.
+
+```python
+from page_objects import MainPage
+
+
+def test_some_element():
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    
+    page.go_to_site()
+    element = page.find_elements(locator)
+```
+
+## Использование в [PageObject](https://ru.wikipedia.org/wiki/PageObject)
+
+Использование паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject) позволяет упростить написание, поддержку 
+и масштабирование тестов. Базовый класс может в этом помочь. 
+
+Допустим, нужно протестировать сайт `https://www.python.org/`. Он содержит множество страниц и элементов.
+Паттерн подразумевает, что каждая страница будет представлена как отдельный класс.
+
+Тогда, структура проекта может выглядеть следующим образом:
+```
+project/
+├── page_object/
+│   ├── __init__.py
+│   ├── main_page.py
+│   └── about_page.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_main_page.py
+│   └── test_about_page.py
+├── ...
+└── ...
+```
+
+...
+
