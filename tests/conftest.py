@@ -1,8 +1,22 @@
 import multiprocessing
 import time
-from core_page.tests.flask_app.app import run_flask
+from base_page.tests.flask_app.app import run_flask
 
 import pytest
+from selenium import webdriver
+
+
+@pytest.fixture()
+def chrome_options():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    return options
+
+
+@pytest.fixture()
+def driver(chrome_options):
+    one_driver = webdriver.Chrome(chrome_options)
+    return one_driver
 
 
 @pytest.fixture(scope='session')
