@@ -5,8 +5,8 @@ with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
 setup(
-    name='base_page',
-    version='0.1',
+    name='core_page',
+    version='0.0.1',
     packages=['base_page'],
     description='Утилита для расширенного взаимодействия с любым веб-сайтом и его страницами',
     long_description=readme,
