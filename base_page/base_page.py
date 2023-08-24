@@ -1,7 +1,9 @@
 import os
+from functools import partial
 from typing import Callable
 from urllib.parse import urljoin
 
+import pytest
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
@@ -24,7 +26,7 @@ class BasePage:
         1. Указывает драйвер для последующей работы с selenium;
         2. Собирает url страницы, на которую нужно осуществить последующий переход;
         3. Устанавливает размер экрана страницы браузера.
-        :param driver_fabric: Selenium-драйвер. Используется для доступа к методам работы со страницей.
+        :param driver: Selenium-драйвер. Используется для доступа к методам работы со страницей.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """

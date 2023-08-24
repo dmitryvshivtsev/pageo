@@ -20,7 +20,7 @@ def base_page():
     driver = Mock()
     url_suffix = "/test"
     window_size = (1920, 1080)
-    return BasePage(driver_fabric=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
+    return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
 def test_init(base_page):
