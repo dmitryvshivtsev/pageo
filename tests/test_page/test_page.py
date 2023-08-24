@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 
 
 class TestPage(BasePage):
+    __test__ = False
+
     def check_caption(self):
         actual_caption = self.find_element((By.CLASS_NAME, "caption")).text
         assert actual_caption == 'caption'
