@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: nanasess/setup-chromedriver@v2
       with:
-        chromedriver-version: vars.CHROME_VERSION
+        chromedriver-version: ${{ CHROME_VERSION }}
 
     - name: setup chrome-driver Linux
       if: runner.os == 'Linux'
