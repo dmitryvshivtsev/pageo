@@ -49,7 +49,9 @@ jobs:
       run: pip3 install -r requirements_dev.txt
 
     - name: Run tests
-      run: pytest
+      run: |
+        pytest tests/unit_tests.py
+        pytest tests/functional_tests.py
 
     - name: Install the library
       run: python3 setup.py install
