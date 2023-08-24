@@ -1,5 +1,5 @@
 # core-page
-[![lib-tests](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test_package.yml/badge.svg)](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test.package.yml)
+[![lib-tests](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test_package.yml/badge.svg)](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test_package.yml)
 [![lib-publish](https://github.com/dmitryvshivtsev/core_page/actions/workflows/publish_package.yml/badge.svg)](https://github.com/dmitryvshivtsev/core_page/actions/workflows/publish_package.yml)
 
 Библиотека для автоматической работы с любыми веб-страницами и их элементами на базе Selenium. 
