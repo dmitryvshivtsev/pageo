@@ -15,7 +15,7 @@ class BasePage:
     """
     def __init__(self,
                  base_url,
-                 driver_fabric=webdriver.Chrome,
+                 driver=None,
                  window_size=(1920, 1080),
                  url_suffix='',
                  ):
@@ -28,7 +28,7 @@ class BasePage:
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
-        self.driver = driver_fabric()
+        self.driver = webdriver.Chrome() if driver is None else driver
         self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
