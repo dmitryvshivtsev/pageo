@@ -1,7 +1,9 @@
-name: Test-Python-Package
+name: Upload-Python-Package
 
 on:
-  push
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -30,4 +32,10 @@ jobs:
 
     - name: Install the library
       run: python3 setup.py install
+
+    # - name: Publish package
+    #   uses: pypa/gh-action-pypi-publish@release/v0.1
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_API_TOKEN }}
 
