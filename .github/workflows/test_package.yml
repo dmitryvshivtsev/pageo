@@ -48,10 +48,15 @@ jobs:
     - name: Install dependencies
       run: pip3 install -r requirements_dev.txt
 
-    - name: Run tests
+    - name: Run tests and show coverage
       run: |
-        pytest tests/unit_tests.py
-        pytest tests/functional_tests.py
+        coverage run --source=base_page -m pytest tests/unit_tests.py tests/functional_tests.py --cache-clear
+        coverage report -m
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Install the library
       run: python3 setup.py install
