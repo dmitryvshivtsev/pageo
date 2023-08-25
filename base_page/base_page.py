@@ -65,7 +65,7 @@ class BasePage:
         """
         self.driver.get(self.url)
 
-    def custom_wait_until(self, func_condition: Callable, duration=10):
+    def custom_wait_until(self, func_condition: Callable, duration=5):
         """
         Метод позволяет задавать ожидания на основе
         пользовательских условий.
@@ -81,19 +81,18 @@ class BasePage:
         """
         WebDriverWait(self.driver, duration).until(func_condition)
 
-    def wait_until_url_is_not_changed(self):
+    def wait_until_url_is_not_changed(self, duration=5):
         """
         Метод добавляет ожидание до тех пор, пока url не изменится.
 
         В качестве применения ожидания метод использует базовый метод для добавления ожиданий
         'custom_wait_until'.
         """
-        self.custom_wait_until(lambda browser: browser.current_url != self.url)
+        self.custom_wait_until(lambda browser: browser.current_url != self.url, duration)
 
-    def point_element(self, element):
+    def move_to_element(self, element):
         """
-        Имитирует наведение на элемент, чтобы проверять
-        работу псевдо класса :hover.
+        Имитирует наведение мыши на элемент.
 
         :param element: Какой-либо WebElement.
         """
