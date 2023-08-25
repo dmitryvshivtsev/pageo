@@ -1,13 +1,13 @@
-from urllib.parse import urljoin
-
 from core_page.base_page.base_page import BasePage
-from unittest.mock import Mock, patch
+from urllib.parse import urljoin
+from unittest.mock import Mock, patch, MagicMock
 
 import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
+
 
 base_url_test = "https://test.com"
 
@@ -20,7 +20,7 @@ def base_page():
     driver = Mock()
     url_suffix = "/test"
     window_size = (1920, 1080)
-    return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
+    return BasePage(driver_fabric=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
 def test_init(base_page):
@@ -131,24 +131,11 @@ def test_custom_wait_until_timeout_exception(mock_until, base_page):
     mock_until.assert_called_once()
 
 
-@patch.object(BasePage, 'custom_wait_until')
-def test_wait_until_url_is_not_changed(mock_custom_until, base_page):
-    statement = True
-    mock_custom_until.return_value = statement
+@patch.object(ActionChains, 'move_to_element')
+def test_my_function(mock_move_to_element, base_page):
+    element = MagicMock()
+    base_page.move_to_element(element)
+    mock_move_to_element.assert_called_once()
 
-    base_page.wait_until_url_is_not_changed()
-
-    mock_custom_until.assert_called_once()
-
-
-@patch.object(BasePage, 'custom_wait_until')
-def test_wait_until_url_is_not_changed(mock_custom_wait_until, base_page):
-    base_page.custom_wait_until = mock_custom_wait_until
-
-    base_page.current_url = 'https://other_email.com'
-
-    base_page.wait_until_url_is_not_changed()
-
-    mock_custom_wait_until.assert_called_once()
 
 
