@@ -26,12 +26,11 @@
 * [Установка](#)
 * [Быстрый старт](#быстрый-старт)
 * [Документация класса](#документация-класса)
-    * [Конструктор класса](#конструктор-класса)
+    * [Создание объекта](#создание-объекта)
     * [Метод go_to_site](#метод-gotosite)
     * [Метод find_element](#метод-findelement)
     * [Метод find_elements](#метод-findelements)
     * [Метод custom_wait_until](#метод-customwaituntil)
-    * [Метод wait_until_url_is_not_changed](#метод-waituntilurlisnotchanged)
     * [Метод move_to_element](#метод-movetoelement)
 * [Использование в PageObject](#использование-в-pageobject)
 
@@ -62,7 +61,7 @@ class MainPage(BasePage):
     pass
 ```
 
-Далее, можем создать экземпляр нашего класса MainPage в тест-кейсе и передать необходимые [настройки](#конструктор-класса).
+Далее, можем создать экземпляр нашего класса MainPage в тест-кейсе и передать необходимые [настройки](#создание-объекта).
 
 ```python
 # test_main_page.py
@@ -70,29 +69,65 @@ class MainPage(BasePage):
 from page_objects import MainPage
 
 
-def test_main_page_title(driver):
-    page = MainPage(driver=driver,
-                    base_url='https://example.com',
-                    url_suffix='',)
+def test_main_page_title():
+    page = MainPage(base_url='https://example.com', window_size=(1366, 768))
     
     page.go_to_site()
     
     ...
 ```
-С более подробным примером можно ознакомится в [разделе про Page Object](#использование-в-pageobject)
+С более подробным примером можно ознакомится в [разделе про Page Object](#использование-в-pageobject).
 
 ## Документация класса
 
-### Конструктор класса
+### Создание объекта
 
-Конструктор класса BasePage позволяет установить следующие настройки:
-- **driver - драйвер для работы браузером.** По умолчанию создаёт драйвер для Chrome, если не был передан иной драйвер;
-- **base_url - адрес страницы без относительного пути.** Обязательный аргумент.
+Все возможные аргументы класса:
+- **driver** - объект WebDriver.
+- **driver_fabric** - класс WebDriver.
+- **base_url** - адрес страницы без относительного пути. 
 **Перед адресом страницы должен быть указан протокол!** \
 Пример: `https://google.com`
 - **window_size** - размер страницы браузера в формате `(ширина, высота)`. По умолчанию установлено значение (1920, 1080).
 - **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию относительный путь отсутствует.
 
+
+При создании объекта есть два варианта:
+* Без передачи собственного драйвера. В этом случае драйвер создается в конструкторе. 
+  ```python
+  page = MainPage(base_url='https://google.com')
+  ```
+  
+  Обязательные аргументы:
+  - base_url;
+
+  Необязательные аргументы:
+  - driver_fabric;
+  - window_size;
+  - url_suffix;
+  
+  >   По умолчанию будет создан драйвер для Chrome без опций. Если хотите использовать свой объект WebDriver, 
+  >   то воспользуйтесь следующим вариантом. 
+
+* С передачей собственного объекта WebDriver. \
+  Для примера создадим свой объект WebDriver и передадим ему опции:
+    ```python
+    from selenium import webdriver
+    
+  
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    driver = webdriver.Chrome(options=options)
+ 
+    page = MainPage.with_driver(driver=driver, base_url='https://google.com')
+    ```
+Обязательные аргументы:
+  - driver;
+  - base_url;
+
+  Необязательные аргументы:
+  - window_size;
+  - url_suffix;
 
 ### Метод go_to_site
 
@@ -170,31 +205,8 @@ def test_some_element():
 
     page.go_to_site()
     
-    ...
-    
-    page.custom_wait_until(lambda browser: len(browser.window_handles) != 2)
-```
-
-### Метод wait_until_url_is_not_changed
-
-Метод `wait_until_url_is_not_changed` ожидает изменения url адреса.
-
-Метод принимает один аргумент:
-- duration - время в секундах, в течение которого будет выполняться ожидание.
-
-```python
-from page_objects import MainPage
-
-
-def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-
-    page.go_to_site()
-    
-    some_link = find_element(locator).click()
-    page.wait_until_url_is_not_changed()
-    
-    ...
+    some_link = page.find_element(locator).click()
+    page.custom_wait_until(lambda browser: browser.current_url != page.url)
 ```
 
 ### Метод move_to_element
