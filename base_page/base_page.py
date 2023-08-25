@@ -1,9 +1,6 @@
-import os
-from functools import partial
 from typing import Callable
 from urllib.parse import urljoin
 
-import pytest
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
@@ -17,7 +14,7 @@ class BasePage:
     """
     def __init__(self,
                  base_url,
-                 driver=None,
+                 driver_fabric=webdriver.Chrome,
                  window_size=(1920, 1080),
                  url_suffix='',
                  ):
@@ -26,16 +23,23 @@ class BasePage:
         1. Указывает драйвер для последующей работы с selenium;
         2. Собирает url страницы, на которую нужно осуществить последующий переход;
         3. Устанавливает размер экрана страницы браузера.
-        :param driver: Selenium-драйвер. Используется для доступа к методам работы со страницей.
+        :param driver_fabric: Selenium-драйвер. Используется для доступа к методам работы со страницей.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
-        self.driver = webdriver.Chrome() if driver is None else driver
+        self.driver = driver_fabric()
         self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
         screen_width, screen_height = window_size
         self.driver.set_window_size(screen_width, screen_height)
+
+    @classmethod
+    def with_driver(cls, driver, base_url, *args, **kwargs):
+        """
+        Создает экземпляр класса BasePage с переданным драйвером.
+        """
+        return cls(base_url, driver_fabric=lambda: driver, *args, **kwargs)
 
     def find_element(self, locator, duration=5):
         """
@@ -80,15 +84,6 @@ class BasePage:
         :param duration: Числовое значение в секундах, используемое для передачи его в явное ожидания.
         """
         WebDriverWait(self.driver, duration).until(func_condition)
-
-    def wait_until_url_is_not_changed(self, duration=5):
-        """
-        Метод добавляет ожидание до тех пор, пока url не изменится.
-
-        В качестве применения ожидания метод использует базовый метод для добавления ожиданий
-        'custom_wait_until'.
-        """
-        self.custom_wait_until(lambda browser: browser.current_url != self.url, duration)
 
     def move_to_element(self, element):
         """
