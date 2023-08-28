@@ -3,6 +3,10 @@
 [![PyPI version](https://badge.fury.io/py/core-page.svg)](https://badge.fury.io/py/core-page)
 [![codecov](https://codecov.io/gh/dmitryvshivtsev/core_page/branch/develop/graph/badge.svg)](https://codecov.io/gh/dmitryvshivtsev/core_page)
 
+<p align="center">
+  <img src="logo/logo.png">
+</p>
+
 Библиотека для автоматической работы с любыми веб-страницами и их элементами на базе Selenium. 
 Вдохновлена статьёй на [Хабр](https://habr.com/ru/articles/472156/) и упрощает написание автоматических тестов 
 с реализацией паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject). Ускорьте написание кода, а также сделайте его лаконичнее и яснее.
