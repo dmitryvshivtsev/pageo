@@ -11,8 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        os: [ubuntu-latest]
+        python-version: ['3.11']
 
     steps:
     - uses: actions/checkout@v3
@@ -27,22 +27,10 @@ jobs:
         chromedriver-version: ${{ vars.CHROME_VERSION }}
 
     - name: setup chrome-driver Linux
-      if: runner.os == 'Linux'
       run: |
         export DISPLAY=:99
         chromedriver --url-base=/wd/hub &
         sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
-    - name: setup chrome-driver MacOS
-      if: runner.os == 'macOS'
-      run: |
-        export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
-        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
-    - name: setup chrome-driver Windows
-      if: runner.os == 'Windows'
-      run: chromedriver --url-base=/wd/hub &
 
     - name: Update pip
       run: pip3 install --upgrade pip
