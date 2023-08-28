@@ -6,7 +6,7 @@ with open("README.md", "r", encoding='utf-8') as readme_file:
 
 setup(
     name='core_page',
-    version='0.1.0',
+    version='0.1.1',
     packages=['base_page'],
     description='Утилита для расширенного взаимодействия с любым веб-сайтом и его страницами',
     long_description=readme,
