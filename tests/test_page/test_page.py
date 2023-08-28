@@ -1,4 +1,4 @@
-from core_page.base_page.base_page import BasePage
+from core_page.core_page.core_page import BasePage
 
 from selenium.webdriver.common.by import By
 
