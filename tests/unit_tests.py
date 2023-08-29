@@ -1,4 +1,4 @@
-from core_page.core_page.core_page import BasePage
+from ..core_page import BasePage
 from urllib.parse import urljoin
 from unittest.mock import Mock, patch, MagicMock
 
