@@ -1,4 +1,4 @@
-from test_page.test_page import TestPage
+from tests.test_page import TestPage
 
 
 def test_caption(driver, url):
