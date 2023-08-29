@@ -6,6 +6,9 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from pageo.locators.abstract_locator import AbstractLocator
+from pageo.utils.map_dict import MapDict
+
 
 class BasePage:
     """
@@ -34,12 +37,25 @@ class BasePage:
         screen_width, screen_height = window_size
         self.driver.set_window_size(screen_width, screen_height)
 
+        self.go_to_site()
+        self.locators = MapDict(
+            {key: value for key, value in self.__class__.__dict__.items() if isinstance(value, AbstractLocator)},
+            lambda x: x.__get__(self)
+        )
+
+        for name, value in self.__class__.__dict__.items():
+            if isinstance(value, AbstractLocator):
+                value.set_name(name)
+
     @classmethod
     def with_driver(cls, driver, base_url, *args, **kwargs):
         """
         Создает экземпляр класса BasePage с переданным драйвером.
         """
         return cls(base_url, driver_fabric=lambda: driver, *args, **kwargs)
+
+    def get_locator(self, name):
+        return self.locators[name]
 
     def find_element(self, locator, duration=5):
         """
