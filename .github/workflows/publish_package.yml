@@ -23,9 +23,12 @@ jobs:
           pip3 install -r requirements_dev.txt
           pip3 install python-semantic-release
 
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Python Semantic Release
         uses: python-semantic-release/python-semantic-release@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_TOKEN }}
           repository_username: __token__
           repository_password: ${{ secrets.PYPI_API_TOKEN }}
