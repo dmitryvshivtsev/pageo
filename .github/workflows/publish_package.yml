@@ -1,58 +1,38 @@
-name: Upload-Python-Package
+name: Release-Python-Package
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.11']
-
+  release:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
 
-    - uses: actions/checkout@v2
-    - uses: nanasess/setup-chromedriver@v2
-      with:
-        chromedriver-version: ${{ vars.CHROME_VERSION }}
+      - name: Update pip
+        run: pip3 install --upgrade pip
 
-    - name: setup chrome-driver Linux
-      run: |
-        export DISPLAY=:99
-        chromedriver --url-base=/wd/hub &
-        sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements_dev.txt
+          pip3 install python-semantic-release
 
-    - name: Update pip
-      run: pip3 install --upgrade pip
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: semantic-release publish
 
-    - name: Install dependencies
-      run: pip3 install -r requirements_dev.txt
-
-    - name: Run tests and show coverage
-      run: |
-        coverage run --source=base_page -m pytest tests/unit_tests.py tests/functional_tests.py --cache-clear
-        coverage report -m
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Publish package
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        python3 setup.py sdist bdist_wheel
-        twine upload dist/*
+      - name: Publish package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          twine upload dist/*
 
