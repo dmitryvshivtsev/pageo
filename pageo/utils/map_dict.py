@@ -1,9 +1,9 @@
 from collections import UserDict
-from typing import Hashable, Callable, Any
+from typing import Hashable, Callable, Any, Dict
 
 
 class MapDict(UserDict):
-    def __init__(self, another_dict: dict[Hashable, Any], function: Callable[[Any], Any]):
+    def __init__(self, another_dict: Dict[Hashable, Any], function: Callable[[Any], Any]):
         self.function = function
         super().__init__(another_dict)
 
