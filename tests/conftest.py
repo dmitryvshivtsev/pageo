@@ -1,5 +1,5 @@
 import multiprocessing
-from flask_app.app import run_flask
+from flask_app import run_flask
 
 import pytest
 from selenium import webdriver
