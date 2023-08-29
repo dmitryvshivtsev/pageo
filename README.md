@@ -1,7 +1,7 @@
-# core-page
-[![lib-tests](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test_package.yml/badge.svg)](https://github.com/dmitryvshivtsev/core_page/actions/workflows/test_package.yml)
-[![PyPI version](https://badge.fury.io/py/core-page.svg)](https://badge.fury.io/py/core-page)
-[![codecov](https://codecov.io/gh/dmitryvshivtsev/core_page/branch/develop/graph/badge.svg)](https://codecov.io/gh/dmitryvshivtsev/core_page)
+# pageo
+[![lib-tests](https://github.com/dmitryvshivtsev/pageo/actions/workflows/test_package.yml/badge.svg)](https://github.com/dmitryvshivtsev/pageo/actions/workflows/test_package.yml)
+[![PyPI version](https://badge.fury.io/py/pageo.svg)](https://badge.fury.io/py/pageo)
+[![codecov](https://codecov.io/gh/dmitryvshivtsev/pageo/branch/develop/graph/badge.svg)](https://codecov.io/gh/dmitryvshivtsev/pageo)
 
 <p align="center">
   <img src="logo/logo.png">

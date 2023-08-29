@@ -4,12 +4,12 @@ from setuptools import setup
 with open("README.md", "r", encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-__version__ = '0.1.1'
+__version__ = '0.1.0'
 
 setup(
-    name='core_page',
+    name='pageo',
     version=__version__,
-    packages=['core_page'],
+    packages=['pageo'],
     description='Утилита для расширенного взаимодействия с любым веб-сайтом и его страницами',
     long_description=readme,
     long_description_content_type='text/markdown',
