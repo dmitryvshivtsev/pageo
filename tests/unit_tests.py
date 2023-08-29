@@ -36,9 +36,8 @@ def test_init(base_page):
 
 def test_go_to_site(base_page):
     """
-    Тест проверяет, что метод перехода на страницу сайта вызывается с верными параметрами.
+    Тест проверяет, что метод перехода на страницу сайта вызывается с верными параметрами внутри конструктора.
     """
-    base_page.go_to_site()
     base_page.driver.get.assert_called_once_with(base_page.url)
 
 
