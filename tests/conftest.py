@@ -1,8 +1,9 @@
 import multiprocessing
-from tests.flask_app.app import run_flask
 
 import pytest
 from selenium import webdriver
+
+from tests.flask_app.app import run_flask
 
 
 @pytest.fixture(scope='session')

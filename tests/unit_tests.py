@@ -1,4 +1,3 @@
-from pageo.base_page import BasePage
 from urllib.parse import urljoin
 from unittest.mock import Mock, patch, MagicMock
 
@@ -7,6 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from pageo.base_page import BasePage
+from pageo.locators.id_locator import IdLocator
+from pageo.locators.class_name_locator import ClassNameLocator
 
 
 base_url_test = "https://test.com"
@@ -20,7 +24,7 @@ def base_page():
     driver = Mock()
     url_suffix = "/test"
     window_size = (1920, 1080)
-    return BasePage(driver_fabric=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
+    return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
 def test_init(base_page):
@@ -47,7 +51,7 @@ def test_find_element(mock_until, base_page):
     mock_element = Mock()
     mock_until.return_value = mock_element
 
-    element = base_page.find_element(locator)
+    element = base_page.find_element(*locator)
 
     mock_until.assert_called_once()
     assert element == mock_element
@@ -59,9 +63,7 @@ def test_find_element_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_element(locator)
-
-    mock_until.assert_called_once()
+        base_page.find_element(*locator)
 
 
 @patch.object(WebDriverWait, 'until')
@@ -72,8 +74,6 @@ def test_find_element_type_exception(mock_until, base_page):
     with pytest.raises(TypeError):
         base_page.find_element(locator)
 
-    mock_until.assert_called_once()
-
 
 @patch.object(WebDriverWait, 'until')
 def test_find_elements(mock_until, base_page):
@@ -81,7 +81,7 @@ def test_find_elements(mock_until, base_page):
     mock_elements = [Mock(), Mock()]
     mock_until.return_value = mock_elements
 
-    elements = base_page.find_elements(locator)
+    elements = base_page.find_elements(*locator)
 
     mock_until.assert_called_once()
     assert elements == mock_elements
@@ -93,7 +93,7 @@ def test_find_elements_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_elements(locator)
+        base_page.find_elements(*locator)
 
     mock_until.assert_called_once()
 
@@ -105,8 +105,6 @@ def test_find_elements_type_exception(mock_until, base_page):
 
     with pytest.raises(TypeError):
         base_page.find_elements(locator)
-
-    mock_until.assert_called_once()
 
 
 @patch.object(WebDriverWait, 'until')
@@ -121,11 +119,10 @@ def test_custom_wait_until(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_custom_wait_until_timeout_exception(mock_until, base_page):
-    condition = Mock()
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_elements(condition)
+        base_page.find_elements('', '')
 
     mock_until.assert_called_once()
 

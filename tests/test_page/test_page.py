@@ -1,17 +1,20 @@
-from pageo.base_page import BasePage
-
 from selenium.webdriver.common.by import By
+
+from pageo.base_page import BasePage
+from pageo.locators.class_name_locator import ClassNameLocator
 
 
 class TestPage(BasePage):
     __test__ = False
+    caption_element = ClassNameLocator(selector="caption")
+    paragraph_elements = ClassNameLocator(selector="paragraphs", is_many=True)
 
     def check_caption(self):
-        actual_caption = self.find_element((By.CLASS_NAME, "caption")).text
+        actual_caption = self.caption_element.text
         assert actual_caption == 'caption'
 
     def check_paragraphs(self):
-        actual_paragraphs = self.find_elements((By.CLASS_NAME, "paragraphs"))
+        actual_paragraphs = self.paragraph_elements
         expected_paragraph_texts = ('first_paragraph', 'second_paragraph')
         for actual_paragraph, expected_paragraph in zip(actual_paragraphs, expected_paragraph_texts):
             assert actual_paragraph.text == expected_paragraph

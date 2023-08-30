@@ -2,13 +2,11 @@ from tests.test_page import TestPage
 
 
 def test_caption(driver, url):
-    page = TestPage.with_driver(driver=driver, base_url=url)
-    page.open_page()
+    page = TestPage(base_url=url, driver=driver)
     page.check_caption()
 
 
 def test_paragraphs(driver, url):
-    page = TestPage.with_driver(driver=driver, base_url=url)
-    page.open_page()
+    page = TestPage(base_url=url, driver=driver)
     page.check_paragraphs()
 
