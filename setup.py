@@ -4,7 +4,7 @@ from setuptools import setup
 with open("README.md", "r", encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-__version__ = '0.1.0'
+__version__ = '0.0.1+8'
 
 setup(
     name='pageo',
