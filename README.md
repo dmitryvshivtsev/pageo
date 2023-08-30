@@ -4,11 +4,11 @@
 [![codecov](https://codecov.io/gh/dmitryvshivtsev/pageo/branch/develop/graph/badge.svg)](https://codecov.io/gh/dmitryvshivtsev/pageo)
 
 <p align="center">
-  <img src="logo/logo.png">
+  <img src="docs/logo/pageo_logo.png">
 </p>
 
-Библиотека для автоматической работы с любыми веб-страницами и их элементами на базе Selenium. 
-Вдохновлена статьёй на [Хабр](https://habr.com/ru/articles/472156/) и упрощает написание автоматических тестов 
+Библиотека на базе Selenium с расширенным функционалом. Предназначена для автоматической работы с любыми веб-страницами и их элементами. 
+Вдохновлена [статьёй на Хабре](https://habr.com/ru/articles/472156/) и упрощает написание автоматических тестов 
 с реализацией паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject). Ускорьте написание кода, а также сделайте его лаконичнее и яснее.
 
 ## Описание
@@ -18,24 +18,34 @@
 получает аттрибуты и т.д.. Все это, как правило, оборачивается в ожидания, чтобы избежать внезапных ошибок.
 Библиотека предоставляет базовый класс, методы которого позволяют скрыть часть этой логики, а также комбинируют в себе
 различные инструменты базового Selenium, тем самым расширяя функциональность.
-Благодаря этому, ускоряется написание тестов, их понимание и последующая поддержка. 
+Благодаря этому ускоряется написание тестов, их понимание и последующая поддержка. 
 
 Преимущества перед использованием Selenium из коробки:
-- Простое использование, путем наследования от базового класса в классы конкретных страниц.
-- Возможность установить настройки для теста, просто передав их в аргументах класса.
+- Простое использование путем наследования от базового класса в классы конкретных страниц.
+- Возможность установить настройки для теста, просто передав их в аргументах класса страницы.
 - Базовые методы поиска элементов расширены и включают в себя явное ожидание.
+- Классы локаторов, скрывающие логику поиска элементов и возвращающие объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
+- Возможность создавать объекты классов страниц как с собственным драйвером, так и с драйвером по умолчанию, который создается при инициализации объекта.
 
 ##  Оглавление
 
 * [Установка](#)
 * [Быстрый старт](#быстрый-старт)
-* [Документация класса](#документация-класса)
-    * [Создание объекта](#создание-объекта)
-    * [Метод go_to_site](#метод-gotosite)
-    * [Метод find_element](#метод-findelement)
-    * [Метод find_elements](#метод-findelements)
-    * [Метод custom_wait_until](#метод-customwaituntil)
-    * [Метод move_to_element](#метод-movetoelement)
+* [Документация базового класса](#документация-базового-класса)
+  * [Создание объекта](#создание-объекта)
+  * [Метод find_element](#метод-findelement)
+  * [Метод find_elements](#метод-findelements)
+  * [Метод custom_wait_until](#метод-customwaituntil)
+  * [Метод move_to_element](#метод-movetoelement)
+* [Классы локаторов](#классы-локаторов)
+  * [Класс class_name_locator](#classnamelocator)
+  * [css_locator](#csslocator)
+  * [id_locator](#idlocator)
+  * [link_text_locator](#linktextlocator)
+  * [name_locator](#namelocator)
+  * [partial_link_text_locator](#partiallinktextlocator)
+  * [tag_name_locator](#tagnamelocator)
+  * [xpath_locator](#xpathlocator)
 * [Использование в PageObject](#использование-в-pageobject)
 
 
@@ -44,7 +54,7 @@
 Установите core-page через pip:
 
 ```shell
-pip install core-page
+pip install pageo
 ```
 
 **Использование библиотеки подразумевает, что на вашем компьютере уже имеется chromedriver.
@@ -55,40 +65,49 @@ pip install core-page
 
 Cоздаем файл для тестируемой страницы и импортируем класс BasePage.\
 Создаем класс страницы и наследуемся от BasePage. Теперь нам доступны все [методы](#документация-класса) базового класса.
+Также импортируем [класс локатора](#классы-локаторов) [`IdLocator`](#idlocator). С его помощью будет выполняться поиск элемента.
 
 ```python
-# main_page.py
+# about_page.py
 
-from base_page.base_page import BasePage
+from pageo.base_page import BasePage
+from pageo.locators.id_locator import IdLocator
 
-class MainPage(BasePage):
-    pass
+
+class AboutPage(BasePage):
+    search_field_element = IdLocator("id-search-field")
+
+    def is_search_field(self):
+        return True if self.search_field_element else False
 ```
 
-Далее, можем создать экземпляр нашего класса MainPage в тест-кейсе и передать необходимые [настройки](#создание-объекта).
+Далее, можем создать экземпляр нашего класса `AboutPage` в тест-кейсе и передать необходимые [настройки](#создание-объекта).
 
 ```python
-# test_main_page.py
+# test_about_page.py
 
-from page_objects import MainPage
+from about_page import AboutPage
 
 
-def test_main_page_title():
-    page = MainPage(base_url='https://example.com', window_size=(1366, 768))
-    
-    page.go_to_site()
-    
-    ...
+def test_search_field_exist():
+    page = AboutPage.without_driver(
+        base_url='https://www.python.org',
+        url_suffix='/about',
+    )
+
+    search_field_exist = page.is_search_field()
+    print(page.is_search_field())
+    assert search_field_exist
 ```
-С более подробным примером можно ознакомится в [разделе про Page Object](#использование-в-pageobject).
+Подробнее этот пример описан в [разделе про Page Object](#использование-в-pageobject).
 
-## Документация класса
+## Документация базового класса
 
 ### Создание объекта
 
 Все возможные аргументы класса:
-- **driver** - объект WebDriver.
-- **driver_fabric** - класс WebDriver.
+- **driver** - объект `WebDriver`. Обязательный аргумент.
+- **driver_fabric** - класс `WebDriver`.
 - **base_url** - адрес страницы без относительного пути. 
 **Перед адресом страницы должен быть указан протокол!** \
 Пример: `https://google.com`
@@ -97,9 +116,9 @@ def test_main_page_title():
 
 
 При создании объекта есть два варианта:
-* Без передачи собственного драйвера. В этом случае драйвер создается в конструкторе. 
+* Без передачи собственного драйвера с использованием метода `withoud_driver()`. В этом случае драйвер создается внутри метода класса `without_driver()`. 
   ```python
-  page = MainPage(base_url='https://google.com')
+  page = MainPage.without_driver(base_url='https://google.com')
   ```
   
   Обязательные аргументы:
@@ -110,20 +129,22 @@ def test_main_page_title():
   - window_size;
   - url_suffix;
   
-  >   По умолчанию будет создан драйвер для Chrome без опций. Если хотите использовать свой объект WebDriver, 
+  >   По умолчанию будет создан драйвер для Chrome без опций. Если хотите использовать свой объект `WebDriver`, 
   >   то воспользуйтесь следующим вариантом. 
 
-* С передачей собственного объекта WebDriver. \
-  Для примера создадим свой объект WebDriver и передадим ему опции:
+* С передачей собственного объекта `WebDriver`. \
+  Для примера создадим свой объект `WebDriver` и передадим ему опции:
     ```python
     from selenium import webdriver
+  
+    from main_page import MainPage
     
   
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     driver = webdriver.Chrome(options=options)
  
-    page = MainPage.with_driver(driver=driver, base_url='https://google.com')
+    page = MainPage(driver=driver, base_url='https://google.com')
     ```
 Обязательные аргументы:
   - driver;
@@ -133,20 +154,6 @@ def test_main_page_title():
   - window_size;
   - url_suffix;
 
-### Метод go_to_site
-
-Осуществляет переход по полному URL страницы (после объединения **base_url** и **url_suffix**). 
-Метод `go_to_site` ничего не принимает и не возвращает.
-
-```python
-from page_objects import MainPage
-
-
-def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-    
-    page.go_to_site()  # Переход на сайт https://google.com/doodles
-```
 
 ### Метод find_element
 
@@ -154,19 +161,20 @@ def test_some_element():
 Иначе выбрасывает TimeoutException.
 
 Принимает следующие аргументы:
-- locator - [локатор](https://www.selenium.dev/documentation/webdriver/elements/locators/) элемента. Значения по умолчанию нет.
+- by - [Стратегия для поиска элемента](https://www.selenium.dev/documentation/webdriver/elements/locators/). Обязательный аргумент.
+- selector - [Селектор элемента, который необходимо найти](https://www.selenium.dev/documentation/webdriver/elements/finders/). Обязательный аргумент.
 - duration - время в секундах, в течение которого будет осуществляться поиск элемента. Значение по умолчанию - 5 секунд.
 
 ```python
+from selenium.webdriver.common.by import By
+
 from page_objects import MainPage
 
 
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-    
-    page.go_to_site()
-    
-    element = page.find_element(locator, duration=10)
+      
+    element = page.find_element(By.ID, 'about-link')
 ```
 
 ### Метод find_elements
@@ -176,19 +184,20 @@ def test_some_element():
 Иначе выбрасывает TimeoutException.
 
 Принимает следующие аргументы:
-- locator - [локатор](https://www.selenium.dev/documentation/webdriver/elements/locators/) элементов. Значения по умолчанию нет.
+- by - [Стратегия для поиска элементов](https://www.selenium.dev/documentation/webdriver/elements/locators/). Обязательный аргумент.
+- selector - [Селектор элементов, которые необходимо найти](https://www.selenium.dev/documentation/webdriver/elements/finders/). Обязательный аргумент.
 - duration - время в секундах, в течение которого будет осуществляться поиск элементов. Значение по умолчанию - 5 секунд.
 
 ```python
+from selenium.webdriver.common.by import By
+
 from page_objects import MainPage
 
 
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-    
-    page.go_to_site()
-    
-    element = page.find_elements(locator)
+  
+    element = page.find_elements(By.ID, 'nav-list')
 ```
 
 ### Метод custom_wait_until
@@ -201,38 +210,173 @@ def test_some_element():
 - duration - время в секундах, в течение которого будет выполняться ожидание.
 
 ```python
+from selenium.webdriver.common.by import By
+
 from page_objects import MainPage
 
 
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-
-    page.go_to_site()
-    
-    some_link = page.find_element(locator).click()
+  
+    page.find_element(By.ID, 'about-link').click()
     page.custom_wait_until(lambda browser: browser.current_url != page.url)
+
+    ...
 ```
 
 ### Метод move_to_element
 
-Метод `move_to_element` имитирует наведение мыши на элемент. Комбинирует внутри себя создание объекта *ActionChains*, 
+Метод `move_to_element` имитирует наведение мыши на элемент. Комбинирует внутри себя создание объекта `ActionChains`, 
 наведение на элемент и выполнение действия (метод perform).
 
 Метод принимает один аргумент:
-- element - объект **WebElement**, на который нужно выполнить наведение мыши. 
+- element - объект `WebElement`, на который нужно выполнить наведение мыши.
 
 ```python
+from selenium.webdriver.common.by import By
+
 from page_objects import MainPage
 
 
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+  
+    about_button = page.find_element(By.ID, 'about-link')
+    page.move_to_element(about_button)
+    
+    ...
+```
 
-    page.go_to_site()
-    
-    dropdown_menu = page.find_element(locator)
-    page.move_to_element(dropdown_menu)
-    
+## Классы локаторов
+
+Вспомогательные классы локаторов для `BasePage`, инкапсулирующие логику поиска элементов по локаторам.
+Каждый класс наследуется от абстрактного класса `AbstractLocator`.
+Использование классов локаторов позволяет объявлять их в классах страницы как аттрибуты класса. Если селектор изменится 
+или нужно изменить стратегию поиска элемента, то достаточно просто изменить сам класс-стратегию или селектор элемента в аргументах.
+
+Принимаемые аргументы:
+- by - стратегия поиска элемента (например, по аттрибуту ID). Обязательный аргумент.
+- locator - сам локатор. Обязательный аргумент.
+
+Каждый класс локатора возвращает объект `WebElement`.
+
+### class_name_locator
+
+Класс локатора, выполняющий поиск на основе имени класса элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.class_name_locator import ClassNameLocator 
+
+
+class SomePage(BasePage):
+    some_element = ClassNameLocator("some-class-name")
+
+    ...
+```
+
+### css_locator
+
+Класс локатора, выполняющий поиск на основе css-локатора элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.css_locator import CSSLocator
+
+
+class SomePage(BasePage):
+    some_element = CSSLocator("some-css-locator")
+
+    ...
+```
+
+### id_locator
+
+Класс локатора, выполняющий поиск на основе аттрибута id у тега элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.id_locator import IdLocator
+
+
+class SomePage(BasePage):
+    some_element = IdLocator("some-id-attribute")
+
+    ...
+```
+
+### link_text_locator
+
+Класс локатора, выполняющий поиск на основе текста внутри ссылки элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.link_text_locator import LinkTextLocator
+
+
+class SomePage(BasePage):
+    some_element = LinkTextLocator("some-link-text")
+
+    ...
+```
+
+### name_locator
+
+Класс локатора, выполняющий поиск на основе аттрибута name у тега элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.name_locator import NameLocator
+
+
+class SomePage(BasePage):
+    some_element = NameLocator("some-name-attribute")
+
+    ...
+```
+
+### partial_link_text_locator
+
+Класс локатора, выполняющий поиск на основе вхождения текста внутри ссылки элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.partial_link_text_locator import PartialLinkTextLocator
+
+
+class SomePage(BasePage):
+    some_element = PartialLinkTextLocator("some-partial-link-text")
+
+    ...
+```
+
+### tag_name_locator
+
+Класс локатора, выполняющий поиск на основе имени тега элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.tag_name_locator import TagNameLocator
+
+
+class SomePage(BasePage):
+    some_element = TagNameLocator("some-tag-name")
+
+    ...
+```
+
+### xpath_locator
+
+Класс локатора, выполняющий поиск на основе пути XPath до элемента.
+
+```python
+from pageo.base_page import BasePage
+from pageo.locators.xpath_locator import XPATHLocator
+
+
+class SomePage(BasePage):
+    some_element = XPATHLocator("some-xpath")
+
     ...
 ```
 
@@ -260,28 +404,21 @@ project/
 ```
 
 Рассмотрим файл *about_page.py*. Он должен описывать методы, содержащие поиск элементов и взаимодействие с ними. \
-Над классом страницы можно описать класс, содержащий локаторы элементов на странице.
 В нашем случае, протестируем наличие поля для поиска по сайту.
+Для поиска по сайту будет использоваться `IdLocator`. 
 
 ```python
 # about_page.py
 
-from base_page.base_page import BasePage
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-
-
-class AboutPageLocators:
-    LOCATOR_SEARCH_FIELD = (By.ID, "id-search-field")
+from pageo.base_page import BasePage
+from pageo.locators.id_locator import IdLocator
 
     
 class AboutPage(BasePage):
+    search_field_element = IdLocator("id-search-field")
+    
     def is_search_field(self):
-        try:
-          self.find_element(AboutPageLocators.LOCATOR_SEARCH_FIELD)
-          return True
-        except TimeoutException:
-          return False
+        return True if self.search_field_element else False
 ```
 
 Перейдем в файл *test_about_page.py*. Здесь мы создаем тест-кейс, в котором проверяем сценарий, описанный в классе страницы.
@@ -293,12 +430,13 @@ from page_object.about_page import AboutPage
 
 
 def test_search_field_exist():
-    page = AboutPage(base_url='https://www.python.org',
-                     url_suffix='/about',)
-    
-    page.go_to_site()
-    search_field_exist = page.is_search_field()
-    assert search_field_exist
+  page = AboutPage.without_driver(
+      base_url='https://www.python.org', 
+      url_suffix='/about', 
+  )
+
+  search_field_exist = page.is_search_field()
+  assert search_field_exist
 ```
 
 Благодаря такой структуре проекта и использованию паттерна, мы можем легко поддерживать и писать гибкие сценарии.
