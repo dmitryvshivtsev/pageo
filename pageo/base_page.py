@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 
 from selenium import webdriver
 from selenium.webdriver import ActionChains
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -17,10 +18,10 @@ class BasePage:
     """
     def __init__(
             self,
-            base_url,
-            driver_fabric=webdriver.Chrome,
-            window_size=(1920, 1080),
-            url_suffix='',
+            base_url: str,
+            driver: webdriver,
+            window_size: tuple = (1920, 1080),
+            url_suffix: str = '',
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -31,13 +32,14 @@ class BasePage:
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
-        self.driver = driver_fabric()
+        self.driver = driver
         self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
         screen_width, screen_height = window_size
         self.driver.set_window_size(screen_width, screen_height)
-        self.open_page()
+        self.open()
+
         self.locators = MapDict(
             {key: value for key, value in self.__class__.__dict__.items() if isinstance(value, AbstractLocator)},
             lambda x: x.__get__(self)
@@ -48,44 +50,47 @@ class BasePage:
                 value.set_name(name)
 
     @classmethod
-    def with_driver(cls, driver, base_url, *args, **kwargs):
+    def without_driver(cls, base_url: str, driver_fabric: webdriver = webdriver.Chrome, *args, **kwargs):
         """
         Создает экземпляр класса BasePage с переданным драйвером.
         """
-        return cls(base_url, driver_fabric=lambda: driver, *args, **kwargs)
+        driver = driver_fabric()
+        return cls(base_url, driver=driver, *args, **kwargs)
 
-    def get_locator(self, name):
+    def get_locator(self, name: str):
         return self.locators[name]
 
-    def find_element(self, locator, duration=5):
+    def find_element(self, by: str, selector: str, duration: int = 5):
         """
         Метод, для поиска элемента на странице, с использованием явного ожидания.
-        :param locator: Локатор элемента, который необходимо найти.
+        :param by: Стратегия для поиска элемента.
+        :param selector: Селектор элемента, который необходимо найти.
         :param duration: Время, в течение которого будет ожидаться появление элемента. По умолчанию 5 секунд.
         :return: Объект WebElement, если элемент найден на странице.
         Иначе, возвращает TimeoutException с дополнительным сообщением.
         """
-        return WebDriverWait(self.driver, duration).until(EC.presence_of_element_located(locator),
-                                                          message=f"Не найден элемент с локатором {locator}")
+        return WebDriverWait(self.driver, duration).until(EC.presence_of_element_located((by, selector)),
+                                                          message=f"Не найден элемент со стратегией локатора {by} и с селектором {selector}")
 
-    def find_elements(self, locator, duration=5):
+    def find_elements(self, by: str, selector: str, duration: int = 5):
         """
         Метод, для поиска элементов на странице, с использованием явного ожидания.
-        :param locator: Локатор элементов, которые необходимо найти.
+        :param by: Стратегия для поиска элементов.
+        :param selector: Селектор элементов, которые необходимо найти.
         :param duration: Время, в течение которого будет ожидаться появление элементов. По умолчанию 5 секунд.
         :return: Список объектов WebElement, если элементы найдены на странице.
         Иначе, возвращает TimeoutException с дополнительным сообщением.
         """
-        return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located(locator),
-                                                          message=f"Не найдены элементы с локатором  {locator}")
+        return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located((by, selector)),
+                                                          message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
 
-    def open_page(self):
+    def open(self):
         """
         Метод, для перехода на страницу сайта по заданному адресу.
         """
         self.driver.get(self.url)
 
-    def custom_wait_until(self, func_condition: Callable, duration=5):
+    def custom_wait_until(self, func_condition: Callable, duration: int = 5):
         """
         Метод позволяет задавать ожидания на основе
         пользовательских условий.
@@ -101,7 +106,7 @@ class BasePage:
         """
         WebDriverWait(self.driver, duration).until(func_condition)
 
-    def move_to_element(self, element):
+    def move_to_element(self, element: WebElement):
         """
         Имитирует наведение мыши на элемент.
 
