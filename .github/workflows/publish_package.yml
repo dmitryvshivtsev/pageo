@@ -31,9 +31,21 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
           force: patch
           commit: true
-          push: true
           changelog: true
           vcs_release: true
           build_metadata: ${{ github.run_number }}
           repository_username: __token__
           repository_password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: 'Update version'
+          commit-message: 'chore(release): bump version to ${{ env.VERSION }}'
+          branch: 'update-version-${{ github.sha }}'
+          base: 'main'
+          body: |
+            This PR updates the version to ${{ env.VERSION }}.
+        env:
+          VERSION: ${{ steps.semantic_release.outputs.new_version }}
+        if: github.ref == 'refs/heads/main'
+
