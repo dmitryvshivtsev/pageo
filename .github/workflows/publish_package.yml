@@ -29,6 +29,12 @@ jobs:
       - name: Python Semantic Release
         uses: python-semantic-release/python-semantic-release@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_TOKEN }}
+          force: true
+          commit: true
+          push: true
+          changelog: true
+          vcs_release: true
+          build_metadata: ${{ github.run_number }}
           repository_username: __token__
           repository_password: ${{ secrets.PYPI_API_TOKEN }}
