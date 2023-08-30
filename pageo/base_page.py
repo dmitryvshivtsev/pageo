@@ -15,12 +15,13 @@ class BasePage:
     Базовый класс для взаимодействия с любой страницей.
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
-    def __init__(self,
-                 base_url,
-                 driver_fabric=webdriver.Chrome,
-                 window_size=(1920, 1080),
-                 url_suffix='',
-                 ):
+    def __init__(
+            self,
+            base_url,
+            driver_fabric=webdriver.Chrome,
+            window_size=(1920, 1080),
+            url_suffix='',
+    ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
         1. Указывает драйвер для последующей работы с selenium;
@@ -36,8 +37,7 @@ class BasePage:
         self.url = urljoin(self.base_url, self.url_suffix)
         screen_width, screen_height = window_size
         self.driver.set_window_size(screen_width, screen_height)
-
-        self.go_to_site()
+        self.open_page()
         self.locators = MapDict(
             {key: value for key, value in self.__class__.__dict__.items() if isinstance(value, AbstractLocator)},
             lambda x: x.__get__(self)
@@ -79,7 +79,7 @@ class BasePage:
         return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located(locator),
                                                           message=f"Не найдены элементы с локатором  {locator}")
 
-    def go_to_site(self):
+    def open_page(self):
         """
         Метод, для перехода на страницу сайта по заданному адресу.
         """
