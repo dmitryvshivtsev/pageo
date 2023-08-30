@@ -5,7 +5,6 @@ from pageo.locators.abstract_locator import AbstractLocator
 
 class IdLocator(AbstractLocator):
     """
-    Класс представляет собой объект локатора,
-    которые
+    Класс локатора, выполняющий поиск на основе аттрибута id у тега элемента.
     """
     by = By.ID

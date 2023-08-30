@@ -10,7 +10,15 @@ class AbstractLocator(ABC):
     локатор, скрывая логику поиска элементов.
 
     Пример использования наследника в связке с BasePage:
-    >>>
+    >>> from pageo.base_page import BasePage
+    >>> from pageo.locators.id_locator import IdLocator
+
+
+    >>> class AboutPage(BasePage):
+    >>>     search_field_element = IdLocator("id-search-field")
+
+    >>>     def is_search_field(self):
+    >>>         return True if self.search_field_element else False
     """
     def __init__(self, selector: str, is_many: bool = False):
         self.selector = selector
