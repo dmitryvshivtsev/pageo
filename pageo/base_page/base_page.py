@@ -70,8 +70,10 @@ class BasePage(metaclass=MetaBasePage):
         """
         Создает экземпляр класса BasePage с драйвером по умолчанию.
         """
-        page_object = cls(base_url, driver=None, *args, **kwargs)
-        page_object.driver_fabric = driver_fabric
+        driver = driver_fabric()
+        page_object = cls(base_url, driver=driver, *args, **kwargs)
+        # page_object = cls(base_url, driver=None, *args, **kwargs)
+        # page_object.driver_fabric = driver_fabric
         return page_object
 
     @classmethod
