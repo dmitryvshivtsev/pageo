@@ -22,3 +22,11 @@ jobs:
         run: |
           pip3 install -r requirements_dev.txt
           pip3 install python-semantic-release
+
+      - name: Publish package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          twine upload dist/*
