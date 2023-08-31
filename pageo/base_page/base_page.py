@@ -35,7 +35,7 @@ class BasePage(metaclass=MetaBasePage):
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
-        self.driver_fabric = lambda: driver
+        self.driver = driver
         self.base_url = base_url
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
@@ -54,27 +54,6 @@ class BasePage(metaclass=MetaBasePage):
         for name, value in self.__class__.__dict__.items():
             if isinstance(value, AbstractLocator):
                 value.set_name(name)
-
-    @cached_property
-    def driver(self) -> WebDriver:
-        return self.driver_fabric()
-
-    @classmethod
-    def with_driver_fabric(
-            cls,
-            base_url: str,
-            driver_fabric: Callable[[], WebDriver] = webdriver.Chrome,
-            *args,
-            **kwargs,
-    ) -> 'BasePage':
-        """
-        Создает экземпляр класса BasePage с драйвером по умолчанию.
-        """
-        driver = driver_fabric()
-        page_object = cls(base_url, driver=driver, *args, **kwargs)
-        # page_object = cls(base_url, driver=None, *args, **kwargs)
-        # page_object.driver_fabric = driver_fabric
-        return page_object
 
     @classmethod
     def get_inherited_classes(cls) -> List['BasePage']:
