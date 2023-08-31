@@ -61,13 +61,14 @@ class BasePage(metaclass=MetaBasePage):
 
     @classmethod
     def with_driver_fabric(
-            cls,base_url: str,
+            cls,
+            base_url: str,
             driver_fabric: Callable[[], WebDriver] = webdriver.Chrome,
             *args,
             **kwargs,
     ) -> 'BasePage':
         """
-        Создает экземпляр класса BasePage с переданным драйвером.
+        Создает экземпляр класса BasePage с драйвером по умолчанию.
         """
         page_object = cls(base_url, driver=None, *args, **kwargs)
         page_object.driver_fabric = driver_fabric
