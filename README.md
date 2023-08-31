@@ -23,9 +23,8 @@
 Преимущества перед использованием Selenium из коробки:
 - Простое использование путем наследования от базового класса в классы конкретных страниц.
 - Возможность установить настройки для теста, просто передав их в аргументах класса страницы.
-- Базовые методы поиска элементов расширены и включают в себя явное ожидание.
-- Классы локаторов, скрывающие логику поиска элементов и возвращающие объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
-- Возможность создавать объекты классов страниц как с собственным драйвером, так и с драйвером по умолчанию, который создается при инициализации объекта.
+- Базовые [методы](#документация-базового-класса) поиска элементов расширены и включают в себя явное ожидание.
+- [Классы локаторов](#классы-локаторов), скрывающие логику поиска элементов и возвращающие объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
 
 ##  Оглавление
 
@@ -86,11 +85,14 @@ class AboutPage(BasePage):
 ```python
 # test_about_page.py
 
+from selenium import webdriver
+
 from about_page import AboutPage
 
 
 def test_search_field_exist():
-    page = AboutPage.with_driver_fabric(
+    page = AboutPage(
+        driver=webdriver.Chrome(),
         base_url='https://www.python.org',
         url_suffix='/about',
     )
@@ -107,53 +109,37 @@ def test_search_field_exist():
 
 Все возможные аргументы класса:
 - **driver** - объект `WebDriver`. Обязательный аргумент.
-- **driver_fabric** - класс `WebDriver`.
 - **base_url** - адрес страницы без относительного пути. 
 **Перед адресом страницы должен быть указан протокол!** \
 Пример: `https://google.com`
 - **window_size** - размер страницы браузера в формате `(ширина, высота)`. По умолчанию установлено значение (1920, 1080).
-- **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию относительный путь отсутствует.
+- **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию относительный путь отсутствует. \
 
-
-При создании объекта есть два варианта:
-* Без передачи собственного драйвера с использованием метода `with_driver_fabric()`. В этом случае драйвер создается внутри метода класса `with_driver_fabric()`. 
-  ```python
-  page = MainPage.with_driver_fabric(base_url='https://google.com')
-  ```
+**Рекомендуется предварительно создавать свой объект `WebDriver`.**\
+Для примера создадим свой объект `WebDriver` и передадим ему опции:
+```python
+from selenium import webdriver
   
-  Обязательные аргументы:
-  - base_url;
-
-  Необязательные аргументы:
-  - driver_fabric;
-  - window_size;
-  - url_suffix;
-  
-  >   По умолчанию будет создан драйвер для Chrome без опций. Если хотите использовать свой объект `WebDriver`, 
-  >   то воспользуйтесь следующим вариантом. 
-
-* С передачей собственного объекта `WebDriver`. \
-  Для примера создадим свой объект `WebDriver` и передадим ему опции:
-    ```python
-    from selenium import webdriver
-  
-    from main_page import MainPage
+from main_page import MainPage
     
   
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    driver = webdriver.Chrome(options=options)
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')
+driver = webdriver.Chrome(options=options)
  
-    page = MainPage(driver=driver, base_url='https://google.com')
-    ```
-Обязательные аргументы:
-  - driver;
-  - base_url;
+page = MainPage(driver=driver, base_url='https://google.com')
+```
 
-  Необязательные аргументы:
-  - window_size;
-  - url_suffix;
+Можно передавать его непосредственно в класс (без предварительного создания):
 
+```python
+from selenium import webdriver
+  
+from main_page import MainPage
+
+
+page = MainPage(driver=webdriver.Chrome(), base_url='https://google.com')
+```
 
 ### Метод find_element
 
@@ -405,7 +391,7 @@ project/
 
 Рассмотрим файл *about_page.py*. Он должен описывать методы, содержащие поиск элементов и взаимодействие с ними. \
 В нашем случае, протестируем наличие поля для поиска по сайту.
-Для поиска по сайту будет использоваться `IdLocator`. 
+Для поиска элемента на сайте будет использоваться `IdLocator`. 
 
 ```python
 # about_page.py
@@ -426,11 +412,14 @@ class AboutPage(BasePage):
 ```python
 # test_about_page.py
 
+from selenium import webdriver
+
 from page_object.about_page import AboutPage
 
 
 def test_search_field_exist():
-  page = AboutPage.with_driver_fabric(
+  page = AboutPage(
+      driver=webdriver.Chrome(),
       base_url='https://www.python.org', 
       url_suffix='/about', 
   )
