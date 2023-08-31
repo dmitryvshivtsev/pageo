@@ -50,7 +50,7 @@ jobs:
 
     - name: Run tests and show coverage
       run: |
-        coverage run --source=pageo -m pytest tests/unit_tests.py tests/functional_tests.py --cache-clear
+        coverage run --source=pageo -m pytest --cache-clear
         coverage report -m
 
     - name: Upload coverage reports to Codecov

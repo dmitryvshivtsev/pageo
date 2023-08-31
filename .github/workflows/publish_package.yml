@@ -14,6 +14,7 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
+
       - name: Update pip
         run: pip3 install --upgrade pip
 
@@ -22,30 +23,10 @@ jobs:
           pip3 install -r requirements_dev.txt
           pip3 install python-semantic-release
 
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Python Semantic Release
-        uses: python-semantic-release/python-semantic-release@master
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          force: patch
-          commit: true
-          changelog: true
-          vcs_release: true
-          build_metadata: ${{ github.run_number }}
-          repository_username: __token__
-          repository_password: ${{ secrets.PYPI_API_TOKEN }}
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          title: 'Update version'
-          commit-message: 'chore(release): bump version to ${{ env.VERSION }}'
-          branch: 'update-version-${{ github.sha }}'
-          base: 'main'
-          body: |
-            This PR updates the version to ${{ env.VERSION }}.
+      - name: Publish package
         env:
-          VERSION: ${{ steps.semantic_release.outputs.new_version }}
-        if: github.ref == 'refs/heads/main'
-
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          twine upload dist/*
