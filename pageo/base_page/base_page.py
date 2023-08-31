@@ -1,5 +1,4 @@
-from threading import Lock
-from typing import Callable, Hashable, List
+from typing import Callable, List
 from functools import cached_property
 from urllib.parse import urljoin
 
@@ -10,28 +9,9 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from pageo.base_page.meta_base_page import MetaBasePage
 from pageo.locators.abstract_locator import AbstractLocator
 from pageo.utils.map_dict import MapDict
-
-
-class DoublePageDefenitionError(Exception):
-    pass
-
-
-class MetaBasePage(type):
-    lock = Lock()
-
-    def __new__(mcls, name, bases, attrs):
-        class_instance = super(MetaBasePage, mcls).__new__(mcls, name, bases, attrs)
-        if len(class_instance.__mro__) > 2:
-            parent_class = class_instance.__mro__[1]
-            with mcls.lock:
-                if not 'inherited_classes' in parent_class.__dict__:
-                    parent_class.inherited_classes = {}
-                if parent_class.inherited_classes.get(name) is not None:
-                    raise DoublePageDefenitionError("You can't to define two classes with the same name.")
-                parent_class.inherited_classes[name] = class_instance
-        return class_instance
 
 
 class BasePage(metaclass=MetaBasePage):
@@ -39,7 +19,6 @@ class BasePage(metaclass=MetaBasePage):
     Базовый класс для взаимодействия с любой страницей.
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
-
     def __init__(
             self,
             base_url: str,
@@ -81,8 +60,12 @@ class BasePage(metaclass=MetaBasePage):
         return self.driver_fabric()
 
     @classmethod
-    def with_driver_fabric(cls, base_url: str, driver_fabric: Callable[[], WebDriver] = webdriver.Chrome, *args,
-                           **kwargs) -> 'BasePage':
+    def with_driver_fabric(
+            cls,base_url: str,
+            driver_fabric: Callable[[], WebDriver] = webdriver.Chrome,
+            *args,
+            **kwargs,
+    ) -> 'BasePage':
         """
         Создает экземпляр класса BasePage с переданным драйвером.
         """

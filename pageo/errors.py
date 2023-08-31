@@ -1,0 +1,2 @@
+class DoublePageDefenitionError(Exception):
+    pass
