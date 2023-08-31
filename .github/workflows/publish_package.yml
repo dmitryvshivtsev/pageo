@@ -19,9 +19,7 @@ jobs:
         run: pip3 install --upgrade pip
 
       - name: Install dependencies
-        run: |
-          pip3 install -r requirements_dev.txt
-          pip3 install python-semantic-release
+        run: pip3 install -r requirements_dev.txt
 
       - name: Publish package
         env:
