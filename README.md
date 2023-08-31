@@ -38,7 +38,7 @@
   * [Метод custom_wait_until](#метод-customwaituntil)
   * [Метод move_to_element](#метод-movetoelement)
 * [Классы локаторов](#классы-локаторов)
-  * [Класс class_name_locator](#classnamelocator)
+  * [class_name_locator](#classnamelocator)
   * [css_locator](#csslocator)
   * [id_locator](#idlocator)
   * [link_text_locator](#linktextlocator)
@@ -70,8 +70,8 @@ Cоздаем файл для тестируемой страницы и имп�
 ```python
 # about_page.py
 
-from pageo.base_page import BasePage
-from pageo.locators.id_locator import IdLocator
+from pageo import BasePage
+from pageo.locators import IdLocator
 
 
 class AboutPage(BasePage):
@@ -90,7 +90,7 @@ from about_page import AboutPage
 
 
 def test_search_field_exist():
-    page = AboutPage.without_driver(
+    page = AboutPage.with_driver_fabric(
         base_url='https://www.python.org',
         url_suffix='/about',
     )
@@ -116,9 +116,9 @@ def test_search_field_exist():
 
 
 При создании объекта есть два варианта:
-* Без передачи собственного драйвера с использованием метода `withoud_driver()`. В этом случае драйвер создается внутри метода класса `without_driver()`. 
+* Без передачи собственного драйвера с использованием метода `with_driver_fabric()`. В этом случае драйвер создается внутри метода класса `with_driver_fabric()`. 
   ```python
-  page = MainPage.without_driver(base_url='https://google.com')
+  page = MainPage.with_driver_fabric(base_url='https://google.com')
   ```
   
   Обязательные аргументы:
@@ -430,7 +430,7 @@ from page_object.about_page import AboutPage
 
 
 def test_search_field_exist():
-  page = AboutPage.without_driver(
+  page = AboutPage.with_driver_fabric(
       base_url='https://www.python.org', 
       url_suffix='/about', 
   )
