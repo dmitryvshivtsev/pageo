@@ -1,7 +1,5 @@
-from selenium.webdriver.common.by import By
-
-from pageo.base_page import BasePage
-from pageo.locators.class_name_locator import ClassNameLocator
+from pageo import BasePage
+from pageo.locators import ClassNameLocator
 
 
 class TestPage(BasePage):

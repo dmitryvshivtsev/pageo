@@ -1,19 +1,119 @@
+from unittest.mock import MagicMock, patch, Mock
 from urllib.parse import urljoin
-from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-from pageo.base_page import BasePage
-from pageo.locators.id_locator import IdLocator
-from pageo.locators.class_name_locator import ClassNameLocator
+from pageo import BasePage
+from pageo import IdLocator
+from pageo.errors import DoublePageDefenitionError
 
 
 base_url_test = "https://test.com"
+
+
+class MockDriver:
+    def set_window_size(self, screen_width, screen_height):
+        pass
+
+    def get(self, url):
+        pass
+
+    def find_element(self, by, selector):
+        return selector
+
+
+def test_inherit_with_locator():
+    selector = 'test-id'
+
+    class A_inherit_with_locator(BasePage):
+        locator_1 = IdLocator(selector)
+
+    class B_inherit_with_locator(A_inherit_with_locator):
+        pass
+
+    object_b = B_inherit_with_locator(driver=MockDriver(), base_url='https://test.com')
+
+    assert object_b.locators['locator_1'] is not None
+    assert object_b.locators['locator_1'] == selector
+    assert object_b['locator_1'] == selector
+    assert object_b.get_locator('locator_1') == selector
+
+
+def test_inherit_with_too_similar_locators():
+    first_selector = 'test-id'
+    second_selector = 'abc'
+
+    class A_inherit_with_too_similar_locators(BasePage):
+        locator_1 = IdLocator(first_selector)
+
+    class B_inherit_with_too_similar_locators(A_inherit_with_too_similar_locators):
+        locator_1 = IdLocator(second_selector)
+
+    object_b = B_inherit_with_too_similar_locators(driver=MockDriver(), base_url='https://test.com')
+
+    assert object_b.locators['locator_1'] is not None
+    assert object_b.locators['locator_1'] == second_selector
+    assert object_b['locator_1'] == second_selector
+    assert object_b.get_locator('locator_1') == second_selector
+
+
+def test_inherit_with_too_similar_locators_and_another_one():
+    first_selector = 'test-id'
+    second_selector = 'abc'
+    third_selector = 'def'
+
+    class A_inherit_with_too_similar_locators_and_another_one(BasePage):
+        locator_1 = IdLocator(first_selector)
+
+    class B_inherit_with_too_similar_locators_and_another_one(A_inherit_with_too_similar_locators_and_another_one):
+        locator_1 = IdLocator(second_selector)
+        locator_2 = IdLocator(third_selector)
+
+    object_b = B_inherit_with_too_similar_locators_and_another_one(driver=MockDriver(), base_url='https://test.com')
+
+    assert object_b.locators['locator_1'] is not None
+    assert object_b.locators['locator_1'] == second_selector
+    assert object_b['locator_1'] == second_selector
+    assert object_b.get_locator('locator_1') == second_selector
+
+    assert object_b.locators['locator_2'] is not None
+    assert object_b.locators['locator_2'] == third_selector
+    assert object_b['locator_2'] == third_selector
+    assert object_b.get_locator('locator_2') == third_selector
+
+
+def test_get_inherited_classes():
+    class A_get_inherited_classes(BasePage):
+        pass
+
+    class B_get_inherited_classes(A_get_inherited_classes):
+        pass
+
+    class C_get_inherited_classes(A_get_inherited_classes):
+        pass
+
+    assert A_get_inherited_classes in BasePage.get_inherited_classes()
+    assert A_get_inherited_classes.get_inherited_classes() == [B_get_inherited_classes, C_get_inherited_classes]
+
+
+def test_get_inherited_classes_without_inheritance():
+    class Kek(BasePage):
+        pass
+
+    assert Kek.get_inherited_classes() == []
+
+
+def test_ingerited_base_page_with_the_same_name():
+    class A_ingerited_base_page_with_the_same_name(BasePage):
+        pass
+
+    with pytest.raises(DoublePageDefenitionError):
+        class A_ingerited_base_page_with_the_same_name(BasePage):
+            pass
 
 
 @pytest.fixture
@@ -132,6 +232,4 @@ def test_my_function(mock_move_to_element, base_page):
     element = MagicMock()
     base_page.move_to_element(element)
     mock_move_to_element.assert_called_once()
-
-
 
