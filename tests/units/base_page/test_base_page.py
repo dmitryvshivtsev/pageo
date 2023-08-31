@@ -127,7 +127,14 @@ def base_page():
     return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
-def test_init(base_page):
+@pytest.fixture
+def base_page_with_driver_fabric():
+    url_suffix = "/test"
+    window_size = (1920, 1080)
+    return BasePage.with_driver_fabric(base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
+
+
+def test_init(base_page, base_page_with_driver_fabric):
     """
     Тест проверяет, что объект был создан корректно и аттрибуты объекта соответствуют ожидаемым.
     """
@@ -136,6 +143,11 @@ def test_init(base_page):
     assert base_page.url_suffix == "/test"
     assert base_page.url == urljoin(base_page.base_url, base_page.url_suffix)
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
+
+    assert base_page_with_driver_fabric.driver is not None
+    assert base_page_with_driver_fabric.base_url == base_url_test
+    assert base_page_with_driver_fabric.url_suffix == "/test"
+    assert base_page_with_driver_fabric.url == urljoin(base_page.base_url, base_page.url_suffix)
 
 
 def test_go_to_site(base_page):
