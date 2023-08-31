@@ -1,15 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 with open("README.md", "r", encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 setup(
     name='pageo',
     version=__version__,
-    packages=['pageo'],
+    packages=find_packages('pageo', exclude=['utils']),
     description='Библиотека на базе Selenium с расширенным функционалом. Предназначена для работы с любым веб-сайтом и его страницами',
     long_description=readme,
     long_description_content_type='text/markdown',
