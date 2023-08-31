@@ -265,8 +265,8 @@ def test_some_element():
 Класс локатора, выполняющий поиск на основе имени класса элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.class_name_locator import ClassNameLocator 
+from pageo import BasePage
+from pageo import ClassNameLocator 
 
 
 class SomePage(BasePage):
@@ -280,8 +280,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе css-локатора элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.css_locator import CSSLocator
+from pageo import BasePage
+from pageo import CSSLocator
 
 
 class SomePage(BasePage):
@@ -295,8 +295,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе аттрибута id у тега элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.id_locator import IdLocator
+from pageo import BasePage
+from pageo import IdLocator
 
 
 class SomePage(BasePage):
@@ -310,8 +310,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе текста внутри ссылки элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.link_text_locator import LinkTextLocator
+from pageo import BasePage
+from pageo import LinkTextLocator
 
 
 class SomePage(BasePage):
@@ -325,8 +325,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе аттрибута name у тега элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.name_locator import NameLocator
+from pageo import BasePage
+from pageo import NameLocator
 
 
 class SomePage(BasePage):
@@ -340,8 +340,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе вхождения текста внутри ссылки элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.partial_link_text_locator import PartialLinkTextLocator
+from pageo import BasePage
+from pageo import PartialLinkTextLocator
 
 
 class SomePage(BasePage):
@@ -355,8 +355,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе имени тега элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.tag_name_locator import TagNameLocator
+from pageo import BasePage
+from pageo import TagNameLocator
 
 
 class SomePage(BasePage):
@@ -370,8 +370,8 @@ class SomePage(BasePage):
 Класс локатора, выполняющий поиск на основе пути XPath до элемента.
 
 ```python
-from pageo.base_page import BasePage
-from pageo.locators.xpath_locator import XPATHLocator
+from pageo import BasePage
+from pageo import XPATHLocator
 
 
 class SomePage(BasePage):
@@ -410,8 +410,8 @@ project/
 ```python
 # about_page.py
 
-from pageo.base_page import BasePage
-from pageo.locators.id_locator import IdLocator
+from pageo import BasePage
+from pageo import IdLocator
 
     
 class AboutPage(BasePage):
