@@ -3,16 +3,24 @@ from pageo.locators import ClassNameLocator
 
 
 class TestPage(BasePage):
+    """
+    Класс тестовой страницы, которая открывается при запуске сервера Flask. Содержит методы, которые
+    взаимодействуют с элементами на странице.
+
+    Класс предназначен для объединения различных модулей
+    в единую группу и их последующего тестирования.
+    """
     __test__ = False
+
     caption_element = ClassNameLocator(selector="caption")
     paragraph_elements = ClassNameLocator(selector="paragraphs", is_many=True)
 
-    def check_caption(self):
-        actual_caption = self.caption_element.text
-        assert actual_caption == 'caption'
+    def get_caption_text(self) -> str:
+        """ Возвращает текст элемента caption_element. """
+        return self.caption_element.text
 
-    def check_paragraphs(self):
+    def get_paragraph_texts(self) -> list:
+        """ Возвращает список, содержащий тексты всех найденных элементов из paragraph_elements. """
         actual_paragraphs = self.paragraph_elements
-        expected_paragraph_texts = ('first_paragraph', 'second_paragraph')
-        for actual_paragraph, expected_paragraph in zip(actual_paragraphs, expected_paragraph_texts):
-            assert actual_paragraph.text == expected_paragraph
+        actual_paragraph_texts = [paragraph.text for paragraph in actual_paragraphs]
+        return actual_paragraph_texts
