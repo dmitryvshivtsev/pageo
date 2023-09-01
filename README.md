@@ -70,7 +70,7 @@ Cоздаем файл для тестируемой страницы и имп�
 # about_page.py
 
 from pageo import BasePage
-from pageo.locators import IdLocator
+from pageo import IdLocator
 
 
 class AboutPage(BasePage):
