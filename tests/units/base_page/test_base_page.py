@@ -16,6 +16,9 @@ base_url_test = "https://test.com"
 
 
 class MockDriver:
+    """
+    Класс для имитации драйвера.
+    """
     def set_window_size(self, screen_width, screen_height):
         pass
 
@@ -27,6 +30,9 @@ class MockDriver:
 
 
 def test_inherit_with_locator():
+    """
+    Тест проверяет видимость локаторов в классе наследнике от класса, унаследованного от BasePage.
+    """
     selector = 'test-id'
 
     class A_inherit_with_locator(BasePage):
@@ -44,6 +50,10 @@ def test_inherit_with_locator():
 
 
 def test_inherit_with_too_similar_locators():
+    """
+    Тест проверяет, что локатор изменяется в классе наследнике от класса, унаследованного от BasePage,
+    в котором был объявлен этот локатор.
+    """
     first_selector = 'test-id'
     second_selector = 'abc'
 
@@ -62,6 +72,11 @@ def test_inherit_with_too_similar_locators():
 
 
 def test_inherit_with_too_similar_locators_and_another_one():
+    """
+    Тест проверяет, что:
+    1. Локатор изменяется в классе наследнике от класса, унаследованного от BasePage, в котором был объявлен этот локатор;
+    2. Доступен новый локатор, объявленный в классе наследнике.
+    """
     first_selector = 'test-id'
     second_selector = 'abc'
     third_selector = 'def'
@@ -87,6 +102,11 @@ def test_inherit_with_too_similar_locators_and_another_one():
 
 
 def test_get_inherited_classes():
+    """
+    Тест проверяет, что:
+    1. Метод класса get_inherited_classes() возвращает список, в котором присутствует класс, унаследованный от BasePage;
+    2. В списке также присутствуют классы наследники от класса, который является наследником BasePage.
+    """
     class A_get_inherited_classes(BasePage):
         pass
 
@@ -101,13 +121,19 @@ def test_get_inherited_classes():
 
 
 def test_get_inherited_classes_without_inheritance():
+    """
+    Тест проверяет, что для класса наследника от BasePage список наследников пустой.
+    """
     class Kek(BasePage):
         pass
 
     assert Kek.get_inherited_classes() == []
 
 
-def test_ingerited_base_page_with_the_same_name():
+def test_inherited_base_page_with_the_same_name():
+    """
+    Тест проверяет, что при наличии двух классов с одинаковым именем, выбрасывается исключение DoublePageDefenitionError.
+    """
     class A_ingerited_base_page_with_the_same_name(BasePage):
         pass
 
@@ -138,7 +164,7 @@ def test_init(base_page):
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
 
 
-def test_go_to_site(base_page):
+def test_open(base_page):
     """
     Тест проверяет, что метод перехода на страницу сайта вызывается с верными параметрами внутри конструктора.
     """
@@ -147,6 +173,9 @@ def test_go_to_site(base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_element(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_element() работает корректно и внутри него срабатывает явное ожидание.
+    """
     locator = (By.ID, "test_id")
     mock_element = Mock()
     mock_until.return_value = mock_element
@@ -159,6 +188,9 @@ def test_find_element(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_element_timeout_exception(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_element() выбрасывает исключение, если элемент не найден.
+    """
     locator = (By.ID, "test_id")
     mock_until.side_effect = TimeoutException("Element not found")
 
@@ -168,6 +200,9 @@ def test_find_element_timeout_exception(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_element_type_exception(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_element() выбрасывает исключение, если переданы неверные аргументы.
+    """
     locator = 123
     mock_until.side_effect = TypeError("Invalid argument")
 
@@ -177,6 +212,9 @@ def test_find_element_type_exception(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_elements(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_elements() работает корректно и внутри него срабатывает явное ожидание.
+    """
     locator = (By.CLASS_NAME, "test_class")
     mock_elements = [Mock(), Mock()]
     mock_until.return_value = mock_elements
@@ -189,6 +227,9 @@ def test_find_elements(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_elements_timeout_exception(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_elements() выбрасывает исключение, если элемент не найден.
+    """
     locator = (By.CLASS_NAME, "test_class")
     mock_until.side_effect = TimeoutException("Element not found")
 
@@ -200,6 +241,9 @@ def test_find_elements_timeout_exception(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_find_elements_type_exception(mock_until, base_page):
+    """
+    Тест проверяет, что метод find_elements() выбрасывает исключение, если переданы неверные аргументы.
+    """
     locator = 123
     mock_until.side_effect = TypeError("Invalid argument")
 
@@ -209,6 +253,9 @@ def test_find_elements_type_exception(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_custom_wait_until(mock_until, base_page):
+    """
+    Тест проверяет, что метод custom_wait_until() вызывает явное ожидание до тех пор, пока не будет выполнено условие.
+    """
     condition = Mock()
     mock_until.return_value = condition
 
@@ -219,6 +266,10 @@ def test_custom_wait_until(mock_until, base_page):
 
 @patch.object(WebDriverWait, 'until')
 def test_custom_wait_until_timeout_exception(mock_until, base_page):
+    """
+    Тест проверяет, что в случае невыполнения условия в течение заданного времени, метод
+    custom_wait_until() выбрасывает исключение TimeoutException.
+    """
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
@@ -228,8 +279,44 @@ def test_custom_wait_until_timeout_exception(mock_until, base_page):
 
 
 @patch.object(ActionChains, 'move_to_element')
-def test_my_function(mock_move_to_element, base_page):
+def test_move_to_element(mock_move_to_element, base_page):
+    """
+    Тест проверяет, что метод работает корректно и наведение мыши на элемент действительно происходит.
+    """
     element = MagicMock()
     base_page.move_to_element(element)
     mock_move_to_element.assert_called_once()
+
+
+def test_class_locator_with_single_element():
+    """
+    Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_element().
+    """
+    mock_instance = Mock()
+    mock_instance.find_element.return_value = "element"
+    locator = IdLocator("selector")
+    result = locator.__get__(mock_instance)
+    assert result == "element"
+    mock_instance.find_element.assert_called_with(locator.by, locator.selector, locator.duration)
+
+
+def test_class_locator_with_multiple_elements():
+    """
+    Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_elements().
+    """
+    mock_instance = Mock()
+    mock_instance.find_elements.return_value = ["element1", "element2"]
+    locator = IdLocator("selector", is_many=True)
+    result = locator.__get__(mock_instance)
+    assert result == ["element1", "element2"]
+    mock_instance.find_elements.assert_called_with(locator.by, locator.selector, locator.duration)
+
+
+def test_class_locator_set_name():
+    """
+    тест проверяет, что метод set_name() в классе локатора работает корректно.
+    """
+    locator = IdLocator("selector")
+    locator.set_name("LOL")
+    assert locator.name == "LOL"
 
