@@ -4,6 +4,13 @@ from pageo.errors import DoublePageDefenitionError
 
 
 class MetaBasePage(type):
+    """
+    Мета-класс для базового класса BasePage. Создает в классах страницы словарь, где:
+    * Ключ - имя класса;
+    * Значение - список унаследованных классов от класса, указанного в ключе.
+    
+    Также проверяет, что нет двух классов страниц с одинаковым именем.
+    """
     lock = Lock()
 
     def __new__(mcls, name, bases, attrs):
