@@ -20,15 +20,15 @@ class AbstractLocator(ABC):
     >>>     def is_search_field(self):
     >>>         return True if self.search_field_element else False
     """
-    def __init__(self, selector: str, is_many: bool = False):
+    def __init__(self, selector: str, is_many: bool = False, duration: int = 5):
         self.selector = selector
         self.is_many = is_many
+        self.duration = duration
 
     def __get__(self, instance, owner=None):
         if self.is_many:
-            return instance.find_elements(self.by, self.selector)
-        return instance.find_element(self.by, self.selector)
+            return instance.find_elements(self.by, self.selector, self.duration)
+        return instance.find_element(self.by, self.selector, self.duration)
 
     def set_name(self, name):
         self.name = name
-
