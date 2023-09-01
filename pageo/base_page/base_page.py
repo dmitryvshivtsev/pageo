@@ -57,11 +57,11 @@ class BasePage(metaclass=MetaBasePage):
     def get_inherited_classes(cls) -> List['BasePage']:
         return list(cls.__dict__.get('inherited_classes', {}).values())
 
-    def __getitem__(self, key: str) -> WebElement:
-        return self.get_locator(key)
-
     def get_locator(self, name: str) -> WebElement:
         return self.locators[name]
+
+    def __getitem__(self, key: str) -> WebElement:
+        return self.get_locator(key)
 
     def find_element(self, by: str, selector: str, duration: int = 5) -> WebElement:
         """
@@ -89,7 +89,7 @@ class BasePage(metaclass=MetaBasePage):
 
     def open(self) -> None:
         """
-        Метод, для перехода на страницу сайта по заданному адресу.
+        Метод открывает страницу по заданному адресу.
         """
         self.driver.get(self.url)
 
