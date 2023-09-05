@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from pageo import BasePage
 from pageo import IdLocator
 from pageo.errors import DoublePageDefenitionError
+from pageo.utils.protocol_setter import base_url_with_protocol
 
 
 base_url_test = "https://test.com"
@@ -158,7 +159,7 @@ def test_init(base_page):
     Тест проверяет, что объект был создан корректно и аттрибуты объекта соответствуют ожидаемым.
     """
     assert base_page.driver is not None
-    assert base_page.base_url == base_url_test
+    assert base_page.base_url == base_url_with_protocol(base_url_test)
     assert base_page.url_suffix == "/test"
     assert base_page.url == urljoin(base_page.base_url, base_page.url_suffix)
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
