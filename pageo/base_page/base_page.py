@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Any
 from urllib.parse import urljoin
 
 from selenium import webdriver
@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from pageo.base_page.meta_base_page import MetaBasePage
 from pageo.locators.abstract_locator import AbstractLocator
 from pageo.utils.map_dict import MapDict
+from pageo.utils.protocol_setter import base_url_with_protocol
 
 
 class BasePage(metaclass=MetaBasePage):
@@ -34,7 +35,7 @@ class BasePage(metaclass=MetaBasePage):
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
         self.driver = driver
-        self.base_url = base_url
+        self.base_url = base_url_with_protocol(base_url)
         self.url_suffix = url_suffix
         self.url = urljoin(self.base_url, self.url_suffix)
         screen_width, screen_height = window_size
@@ -93,7 +94,7 @@ class BasePage(metaclass=MetaBasePage):
         """
         self.driver.get(self.url)
 
-    def custom_wait_until(self, func_condition: Callable, duration: int = 5) -> None:
+    def custom_wait_until(self, func_condition: Callable[[], Any], duration: int = 5) -> None:
         """
         Метод позволяет задавать ожидания на основе
         пользовательских условий.
