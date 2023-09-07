@@ -9,9 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from pageo import BasePage
 from pageo import IdLocator
-from pageo.errors import DoublePageDefenitionError
-from pageo.utils.protocol_setter import base_url_with_protocol
-
+from pageo.errors import DoublePageDefenitionError, UrlAvailabilityError, UrlDisparityError
+from pageo.utils.protocol_setter import get_base_url_with_protocol
 
 base_url_test = "https://test.com"
 
@@ -20,6 +19,7 @@ class MockDriver:
     """
     Класс для имитации драйвера.
     """
+
     def set_window_size(self, screen_width, screen_height):
         pass
 
@@ -108,6 +108,7 @@ def test_get_inherited_classes():
     1. Метод класса get_inherited_classes() возвращает список, в котором присутствует класс, унаследованный от BasePage;
     2. В списке также присутствуют классы наследники от класса, который является наследником BasePage.
     """
+
     class A_get_inherited_classes(BasePage):
         pass
 
@@ -125,6 +126,7 @@ def test_get_inherited_classes_without_inheritance():
     """
     Тест проверяет, что для класса наследника от BasePage список наследников пустой.
     """
+
     class Kek(BasePage):
         pass
 
@@ -135,6 +137,7 @@ def test_inherited_base_page_with_the_same_name():
     """
     Тест проверяет, что при наличии двух классов с одинаковым именем, выбрасывается исключение DoublePageDefenitionError.
     """
+
     class A_ingerited_base_page_with_the_same_name(BasePage):
         pass
 
@@ -151,6 +154,7 @@ def base_page():
     driver = Mock()
     url_suffix = "/test"
     window_size = (1920, 1080)
+
     return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
@@ -159,7 +163,7 @@ def test_init(base_page):
     Тест проверяет, что объект был создан корректно и аттрибуты объекта соответствуют ожидаемым.
     """
     assert base_page.driver is not None
-    assert base_page.base_url == base_url_with_protocol(base_url_test)
+    assert base_page.base_url == get_base_url_with_protocol(base_url_test)
     assert base_page.url_suffix == "/test"
     assert base_page.url == urljoin(base_page.base_url, base_page.url_suffix)
     base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
@@ -298,7 +302,7 @@ def test_class_locator_with_single_element():
     locator = IdLocator("selector")
     result = locator.__get__(mock_instance)
     assert result == "element"
-    mock_instance.find_element.assert_called_with(locator.by, locator.selector, locator.duration)
+    mock_instance.find_element.assert_called_with(locator.by, locator.selector, locator.timeout)
 
 
 def test_class_locator_with_multiple_elements():
@@ -310,14 +314,94 @@ def test_class_locator_with_multiple_elements():
     locator = IdLocator("selector", is_many=True)
     result = locator.__get__(mock_instance)
     assert result == ["element1", "element2"]
-    mock_instance.find_elements.assert_called_with(locator.by, locator.selector, locator.duration)
+    mock_instance.find_elements.assert_called_with(locator.by, locator.selector, locator.timeout)
 
 
 def test_class_locator_set_name():
     """
-    тест проверяет, что метод set_name() в классе локатора работает корректно.
+    Тест проверяет, что метод set_name() в классе локатора работает корректно.
     """
     locator = IdLocator("selector")
     locator.set_name("LOL")
     assert locator.name == "LOL"
 
+
+def test_base_url_class_attribute():
+    class SomePage_test_base_url_class_attribute(BasePage):
+        base_url = 'https://some_url.com'
+
+    page = SomePage_test_base_url_class_attribute(driver=MockDriver())
+    assert hasattr(page, 'base_url')
+    assert page.base_url == 'https://some_url.com'
+
+
+def test_base_url_class_arguments():
+    class SomePage_test_base_url_class_arguments(BasePage):
+        pass
+
+    page = SomePage_test_base_url_class_arguments(driver=MockDriver(),
+                                                  base_url='https://some_url.com')
+    assert page.base_url == 'https://some_url.com'
+
+
+def test_base_url_raise_url_not_specified():
+    class SomePage_test_base_url_raise_url_not_specified(BasePage):
+        pass
+
+    with pytest.raises(UrlAvailabilityError):
+        page = SomePage_test_base_url_raise_url_not_specified(driver=MockDriver())
+
+
+def test_base_url_raise_url_different_in_arguments_and_attributes():
+    class SomePage_test_base_url_different_in_arguments_and_attributes(BasePage):
+        base_url = 'https://some_url.com'
+
+    with pytest.raises(UrlDisparityError):
+        page = SomePage_test_base_url_different_in_arguments_and_attributes(driver=MockDriver(),
+                                                                            base_url='https://another_url.com')
+
+
+def test_url_suffix_class_attribute():
+    class SomePage_test_url_suffix_class_attribute(BasePage):
+        base_url = 'https://some_url.com'
+        url_suffix = '/some_page'
+
+    page = SomePage_test_url_suffix_class_attribute(driver=MockDriver())
+    assert hasattr(page, 'url_suffix')
+    assert page.base_url == 'https://some_url.com'
+    assert page.url_suffix == '/some_page'
+    assert page.url == 'https://some_url.com/some_page'
+
+
+def test_url_suffix_class_argument():
+    class SomePage_test_url_suffix_class_argument(BasePage):
+        base_url = 'https://some_url.com'
+
+    page = SomePage_test_url_suffix_class_argument(driver=MockDriver(),
+                                                   url_suffix='/some_page')
+    assert hasattr(page, 'url_suffix')
+    assert page.base_url == 'https://some_url.com'
+    assert page.url_suffix == '/some_page'
+    assert page.url == 'https://some_url.com/some_page'
+
+
+def test_url_suffix_raise_suffix_different_in_arguments_and_attributes():
+    class SomePage_test_url_suffix_raise_suffix_different_in_arguments_and_attributes(BasePage):
+        base_url = 'https://some_url.com'
+        url_suffix = '/some_page'
+
+    with pytest.raises(UrlDisparityError):
+        page = SomePage_test_url_suffix_raise_suffix_different_in_arguments_and_attributes(driver=MockDriver(),
+                                                                                          url_suffix='/another_page')
+
+
+def test_url_suffix_class_attribute_but_base_url_arguments():
+    class SomePage_test_url_suffix_class_attribute_but_base_url_arguments(BasePage):
+        url_suffix = '/some_page'
+
+    page = SomePage_test_url_suffix_class_attribute_but_base_url_arguments(driver=MockDriver(),
+                                                                           base_url='https://some_url.com')
+    assert hasattr(page, 'url_suffix')
+    assert page.base_url == 'https://some_url.com'
+    assert page.url_suffix == '/some_page'
+    assert page.url == 'https://some_url.com/some_page'

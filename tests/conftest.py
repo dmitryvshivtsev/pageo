@@ -37,6 +37,6 @@ def url():
     process = multiprocessing.Process(target=run_flask, args=(queue, ))
     process.start()
     queue.get()
-    yield 'http://127.0.0.1:8000'
+    yield 'http://127.0.0.1:3000'
     process.terminate()
 
