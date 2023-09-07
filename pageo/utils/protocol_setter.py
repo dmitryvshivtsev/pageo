@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 
 
-def base_url_with_protocol(base_url: str) -> str:
+def get_base_url_with_protocol(base_url: str) -> str:
     """
     Метод добавляет к базовому адресу протокол https, если протокол отсутствует.
     """
