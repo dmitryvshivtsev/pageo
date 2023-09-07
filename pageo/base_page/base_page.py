@@ -10,7 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from pageo.base_page.meta_base_page import MetaBasePage
 from pageo.locators.abstract_locator import AbstractLocator
 from pageo.utils.map_dict import MapDict
-from pageo.utils.protocol_setter import base_url_with_protocol
+from pageo.utils.protocol_setter import get_base_url_with_protocol
+from pageo.errors import UrlAvailabilityError, UrlDisparityError
 
 
 class BasePage(metaclass=MetaBasePage):
@@ -18,12 +19,15 @@ class BasePage(metaclass=MetaBasePage):
     Базовый класс для взаимодействия с любой страницей.
     Содержит общие методы для взаимодействия с элементами на страницах любого веб-сайта.
     """
+    base_url: str = None
+    url_suffix: str = None
+
     def __init__(
             self,
-            base_url: str,
             driver: webdriver,
+            base_url: str = None,
+            url_suffix: str = None,
             window_size: tuple = (1920, 1080),
-            url_suffix: str = '',
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -31,15 +35,30 @@ class BasePage(metaclass=MetaBasePage):
         2. Собирает url страницы, на которую нужно осуществить последующий переход;
         3. Устанавливает размер экрана страницы браузера.
         :param driver: Selenium-драйвер. Используется для доступа к методам работы со страницей.
+        :param base_url: Базовый url страницы.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         """
+
+        if self.base_url is None and base_url is None:
+            raise UrlAvailabilityError("You have to create a 'base_url' in the class attribute"
+                                       " or set the url when creating the object")
+        elif (self.base_url is not None and base_url is not None) and self.base_url != base_url:
+            raise UrlDisparityError("'base_url' in class attributes and in class arguments are different. "
+                                    "Specify one URL in class attributes or in arguments")
+        elif base_url is not None:
+            self.base_url = get_base_url_with_protocol(base_url)
+
+        if (self.url_suffix is not None and url_suffix is not None) and self.url_suffix != url_suffix:
+            raise UrlDisparityError("'url_suffix' in class attributes and in class arguments are different. "
+                                    "Specify one 'url_suffix' in class attributes or in arguments")
+        elif url_suffix is not None:
+            self.url_suffix = url_suffix
+
         self.driver = driver
-        self.base_url = base_url_with_protocol(base_url)
-        self.url_suffix = url_suffix
-        self.url = urljoin(self.base_url, self.url_suffix)
-        screen_width, screen_height = window_size
-        self.driver.set_window_size(screen_width, screen_height)
+        self.url = urljoin(get_base_url_with_protocol(self.base_url), self.url_suffix)
+        self.screen_width, self.screen_height = window_size
+        self.driver.set_window_size(self.screen_width, self.screen_height)
         self.open()
 
         mro_dicts = {}
@@ -63,6 +82,12 @@ class BasePage(metaclass=MetaBasePage):
 
     def __getitem__(self, key: str) -> WebElement:
         return self.get_locator(key)
+
+    def __repr__(self):
+        return f'{type(self).__name__}(base_url="{self.base_url}", ' \
+               f'driver={repr(self.driver)}, ' \
+               f'window_size={(self.screen_width, self.screen_height)}, ' \
+               f'url_suffix="{self.url_suffix}")'
 
     def find_element(self, by: str, selector: str, duration: int = 5) -> WebElement:
         """
