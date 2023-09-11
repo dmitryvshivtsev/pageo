@@ -1,3 +1,4 @@
+import time
 from typing import Callable, List, Any
 from urllib.parse import urljoin
 
@@ -28,6 +29,7 @@ class BasePage(metaclass=MetaBasePage):
             base_url: str = None,
             url_suffix: str = None,
             window_size: tuple = (1920, 1080),
+            cookie: dict = None,
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -38,6 +40,7 @@ class BasePage(metaclass=MetaBasePage):
         :param base_url: Базовый url страницы.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
+        :param cookie: Куки, которые необходимо установить.
         """
 
         if self.base_url is None and base_url is None:
@@ -59,6 +62,12 @@ class BasePage(metaclass=MetaBasePage):
         self.url = urljoin(get_base_url_with_protocol(self.base_url), self.url_suffix)
         self.screen_width, self.screen_height = window_size
         self.driver.set_window_size(self.screen_width, self.screen_height)
+
+        if cookie is not None:
+            self.driver.execute_cdp_cmd('Network.enable', {})
+            self.driver.execute_cdp_cmd('Network.setCookie', cookie)
+            self.driver.execute_cdp_cmd('Network.disable', {})
+
         self.open()
 
         mro_dicts = {}
