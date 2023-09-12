@@ -76,13 +76,16 @@ from pageo import IdLocator
 
 
 class AboutPage(BasePage):
+    base_url = 'https://www.python.org'
+    url_suffix = '/about'
+    
     search_field_element = IdLocator("id-search-field")
-
+    
     def is_search_field(self):
         return True if self.search_field_element else False
 ```
 
-Далее, можем создать экземпляр нашего класса `AboutPage` в тест-кейсе и передать необходимые [настройки](#создание-объекта).
+Далее, можем создать экземпляр нашего класса `AboutPage` в тест-кейсе и при необходимости передать определенные [настройки](#создание-объекта).
 
 ```python
 # test_about_page.py
@@ -93,14 +96,9 @@ from about_page import AboutPage
 
 
 def test_search_field_exist():
-    page = AboutPage(
-        driver=webdriver.Chrome(),
-        base_url='https://www.python.org',
-        url_suffix='/about',
-    )
+    page = AboutPage(driver=webdriver.Chrome())
 
     search_field_exist = page.is_search_field()
-    print(page.is_search_field())
     assert search_field_exist
 ```
 Подробнее этот пример описан в [разделе про Page Object](#использование-в-pageobject).
@@ -109,15 +107,32 @@ def test_search_field_exist():
 
 ### Создание объекта
 
-Аттрибуты класса:
-- **base_url** - адрес страницы без относительного пути. 
-- **url_suffix** - **url_suffix** - относительный путь к конкретной странице сайта.
+**Аттрибуты класса:**
+- **base_url** - адрес страницы без относительного пути.
   > Адрес страницы может быть передан без протокола. В таком случае, будет установлен протокол по умолчанию (*https*).
   > Если адрес страницы имеет протокол *http*, то его следует указать перед адресом страницы самостоятельно!
+  
+- **url_suffix** - относительный путь к конкретной странице сайта.
+
+Пример определения аттрибутов класса:
+```python
+from pageo import BasePage
+from pageo import IdLocator
+  
+  
+class SomePage(BasePage):
+    base_url = 'https://some_page.com'
+    url_suffix = '/some_page_on_site'  
+  
+    some_element = IdLocator("some_id")
+  
+    ...
+```
+
 
 Аргументы класса:
 - **driver** - объект `WebDriver`. Обязательный аргумент.
-- **base_url** - адрес страницы без относительного пути. 
+- **base_url** - адрес страницы без относительного пути. По умолчанию None. Необязательный аргумент.
   > - Передавайте URL в аргументах при создании объекта только в том случае, если адрес не был указан в аттрибутах класса страницы. 
   > - Если адрес страницы был указан и в аттрибутах класса, и в аргументах при создании объекта, но они отличаются, то будет выброшено исключение **UrlDisparityError**.
   > - Если URL не был указан ни в аттрибутах класса, ни в аргументах при создании объекта, то будет выброшено исключение **UrlAvailabilityError**.
@@ -125,11 +140,12 @@ def test_search_field_exist():
   > Адрес страницы может быть передан без протокола. В таком случае, будет установлен протокол по умолчанию (*https*).
   > Если адрес страницы имеет протокол *http*, то его следует указать перед адресом страницы!
 
-- **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию относительный путь отсутствует.
+- **url_suffix** - относительный путь к конкретной странице сайта. По умолчанию None. Необязательный аргумент.
   > - Передавайте относительный путь в аргументах при создании объекта только в том случае, если относительный путь к конкретной странице не был указан в аттрибутах класса страницы. 
   > - Если относительный путь был указан и в аттрибутах класса, и в аргументах при создании объекта, но они отличаются, то будет выброшено исключение **UrlDisparityError**.
 
-- **window_size** - размер страницы браузера в формате `(ширина, высота)`. По умолчанию установлено значение (1920, 1080). 
+- **window_size** - размер страницы браузера в формате `(ширина, высота)`. По умолчанию установлено значение (1920, 1080). Необязательный аргумент.
+- **cookie** - куки, которые необходимо передать перед открытием страницы. Необязательный аргумент.
 
 **Рекомендуется предварительно создавать свой объект `WebDriver`.**\
 Для примера создадим свой объект `WebDriver` и передадим ему опции:
@@ -420,8 +436,14 @@ from pageo import IdLocator
 
     
 class AboutPage(BasePage):
+    # Определяем в аттрибутах класса базовый URL и относительный путь к конкретной странице.
+    base_url='https://www.python.org'
+    url_suffix='/about'
+    
+    # Определяем в аттрибутах класса переменную, которая будет содержать искомый элемент (объект типа WebElement).
     search_field_element = IdLocator("id-search-field")
     
+    # Описываем метод, содержащий сценарий, который будет использоваться непосредственно в кейсе.
     def is_search_field(self):
         return True if self.search_field_element else False
 ```
@@ -436,15 +458,13 @@ from selenium import webdriver
 from page_object.about_page import AboutPage
 
 
+# Создаем тест, который проверяет наличие поля поиска по сайту.
 def test_search_field_exist():
-  page = AboutPage(
-      driver=webdriver.Chrome(),
-      base_url='https://www.python.org', 
-      url_suffix='/about', 
-  )
-
-  search_field_exist = page.is_search_field()
-  assert search_field_exist
+    # Создаем экземпляр класса страницы. (base_url и url_suffix были определены в аттрибутах класса, так что передавать в аргументах их не нужно.)
+    page = AboutPage(driver=webdriver.Chrome())
+    
+    search_field_exist = page.is_search_field()
+    assert search_field_exist
 ```
 
 Благодаря такой структуре проекта и использованию паттерна, мы можем легко поддерживать и писать гибкие сценарии.
