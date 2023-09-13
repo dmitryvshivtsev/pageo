@@ -1,9 +1,17 @@
-import multiprocessing
+import os
 
 import pytest
 from selenium import webdriver
+from flask_fixture import endpoint
 
-from tests.flask_app import run_flask
+
+with open(os.path.join(os.getcwd(), 'templates/index.html'), "r", encoding='utf-8') as page:
+    index_html = page.read()
+
+
+@endpoint('/')
+def root():
+    return index_html
 
 
 @pytest.fixture(scope='session')
@@ -25,18 +33,4 @@ def driver(chrome_options):
     """
     one_driver = webdriver.Chrome(chrome_options)
     return one_driver
-
-
-@pytest.fixture(scope='session')
-def url():
-    """
-    Фикстура создает и запускает процесс, выполняющий запуск сервера Flask.
-    Возвращает url на котором запущен сервер. После выполнения тестов процесс завершается.
-    """
-    queue = multiprocessing.Queue()
-    process = multiprocessing.Process(target=run_flask, args=(queue, ))
-    process.start()
-    queue.get()
-    yield 'http://127.0.0.1:3000'
-    process.terminate()
 

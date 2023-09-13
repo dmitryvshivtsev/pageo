@@ -11,3 +11,8 @@ def test_fixture_options(chrome_options):
 
 def test_fixture_url(url):
     assert url == 'http://127.0.0.1:3000'
+
+
+def test_render_template(root):
+    print(root)
+    assert False
