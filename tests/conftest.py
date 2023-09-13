@@ -5,7 +5,7 @@ from selenium import webdriver
 from flask_fixture import endpoint
 
 
-with open(os.path.join(os.getcwd(), 'templates/index.html'), "r", encoding='utf-8') as page:
+with open(os.path.join('tests', 'integrations', 'templates', 'index.html'), "r", encoding='utf-8') as page:
     index_html = page.read()
 
 
