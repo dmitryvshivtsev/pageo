@@ -1,5 +1,4 @@
-import time
-from typing import Callable, List, Any
+from typing import Callable, List, Any, Dict
 from urllib.parse import urljoin
 
 from selenium import webdriver
@@ -29,7 +28,7 @@ class BasePage(metaclass=MetaBasePage):
             base_url: str = None,
             url_suffix: str = None,
             window_size: tuple = (1920, 1080),
-            cookie: dict = None,
+            cookies: List[Dict[str, str]] = None,
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -63,9 +62,10 @@ class BasePage(metaclass=MetaBasePage):
         self.screen_width, self.screen_height = window_size
         self.driver.set_window_size(self.screen_width, self.screen_height)
 
-        if cookie is not None:
+        if cookies is not None:
             self.driver.execute_cdp_cmd('Network.enable', {})
-            self.driver.execute_cdp_cmd('Network.setCookie', cookie)
+            for cookie in cookies:
+                self.driver.execute_cdp_cmd('Network.setCookie', cookie)
             self.driver.execute_cdp_cmd('Network.disable', {})
 
         self.open()
