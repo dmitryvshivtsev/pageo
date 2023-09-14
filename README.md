@@ -186,7 +186,7 @@ page = MainPage(driver=webdriver.Chrome(), base_url='https://google.com')
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects import MainPage
+from page_objects.main_page import MainPage
 
 
 def test_some_element():
@@ -209,7 +209,7 @@ def test_some_element():
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects import MainPage
+from page_objects.main_page import MainPage
 
 
 def test_some_element():
@@ -230,7 +230,7 @@ def test_some_element():
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects import MainPage
+from page_objects.main_page import MainPage
 
 
 def test_some_element():
@@ -253,7 +253,7 @@ def test_some_element():
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects import MainPage
+from page_objects.main_page import MainPage
 
 
 def test_some_element():
