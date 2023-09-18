@@ -1,17 +1,24 @@
 import os
 
 import pytest
+from flask import render_template
 from selenium import webdriver
-from flask_fixture import endpoint
+from flask_fixture import endpoint, config
 
 
-with open(os.path.join('tests', 'integrations', 'templates', 'index.html'), "r", encoding='utf-8') as page:
-    index_html = page.read()
+@config
+class MyConfig:
+    port: int = 5001
+    template_folder: str = os.path.join(
+        'tests',
+        'integrations',
+        'templates',
+    )
 
 
 @endpoint('/')
 def root():
-    return index_html
+    return render_template('index.html')
 
 
 @pytest.fixture(scope='session')
@@ -21,7 +28,7 @@ def chrome_options():
     Возвращает объект Options.
     """
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
+    # options.add_argument('--headless')
     return options
 
 
