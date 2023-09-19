@@ -185,7 +185,7 @@ def test_find_element(mock_until, base_page):
     mock_element = Mock()
     mock_until.return_value = mock_element
 
-    element = base_page.find_element(*locator)
+    element = base_page._find_element(*locator)
 
     mock_until.assert_called_once()
     assert element == mock_element
@@ -200,7 +200,7 @@ def test_find_element_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_element(*locator)
+        base_page._find_element(*locator)
 
 
 @patch.object(WebDriverWait, 'until')
@@ -212,7 +212,7 @@ def test_find_element_type_exception(mock_until, base_page):
     mock_until.side_effect = TypeError("Invalid argument")
 
     with pytest.raises(TypeError):
-        base_page.find_element(locator)
+        base_page._find_element(locator)
 
 
 @patch.object(WebDriverWait, 'until')
@@ -224,7 +224,7 @@ def test_find_elements(mock_until, base_page):
     mock_elements = [Mock(), Mock()]
     mock_until.return_value = mock_elements
 
-    elements = base_page.find_elements(*locator)
+    elements = base_page._find_elements(*locator)
 
     mock_until.assert_called_once()
     assert elements == mock_elements
@@ -239,7 +239,7 @@ def test_find_elements_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_elements(*locator)
+        base_page._find_elements(*locator)
 
     mock_until.assert_called_once()
 
@@ -253,7 +253,7 @@ def test_find_elements_type_exception(mock_until, base_page):
     mock_until.side_effect = TypeError("Invalid argument")
 
     with pytest.raises(TypeError):
-        base_page.find_elements(locator)
+        base_page._find_elements(locator)
 
 
 @patch.object(WebDriverWait, 'until')
@@ -278,7 +278,7 @@ def test_custom_wait_until_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page.find_elements('', '')
+        base_page._find_elements('', '')
 
     mock_until.assert_called_once()
 
@@ -298,11 +298,23 @@ def test_class_locator_with_single_element():
     Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_element().
     """
     mock_instance = Mock()
-    mock_instance.find_element.return_value = "element"
+    mock_instance._find_element.return_value = "element"
     locator = IdLocator("selector")
     result = locator.__get__(mock_instance)
     assert result == "element"
-    mock_instance.find_element.assert_called_with(locator.by, locator.selector, locator.timeout)
+    mock_instance._find_element.assert_called_with(locator.by, locator.selector, locator.timeout)
+
+
+def test_find_elements_list():
+    """
+    Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_element().
+    """
+    mock_instance = Mock()
+    mock_instance.find_elements.return_value = ["element"]
+    locator = IdLocator("selector")
+    result = mock_instance.find_elements(locator)
+    assert result == ["element"]
+    mock_instance.find_elements.assert_called_with(locator)
 
 
 def test_class_locator_with_multiple_elements():
@@ -310,11 +322,11 @@ def test_class_locator_with_multiple_elements():
     Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_elements().
     """
     mock_instance = Mock()
-    mock_instance.find_elements.return_value = ["element1", "element2"]
+    mock_instance._find_elements.return_value = ["element1", "element2"]
     locator = IdLocator("selector", is_many=True)
     result = locator.__get__(mock_instance)
     assert result == ["element1", "element2"]
-    mock_instance.find_elements.assert_called_with(locator.by, locator.selector, locator.timeout)
+    mock_instance._find_elements.assert_called_with(locator.by, locator.selector, locator.timeout)
 
 
 def test_class_locator_set_name():

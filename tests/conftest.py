@@ -7,7 +7,7 @@ from flask_fixture import endpoint, config
 
 
 @config
-class MyConfig:
+class TestConfig:
     port: int = 5001
     template_folder: str = os.path.join(
         'tests',
@@ -39,5 +39,6 @@ def driver(chrome_options):
     Вовзращает объект WebDriver.
     """
     one_driver = webdriver.Chrome(chrome_options)
-    return one_driver
+    yield one_driver
+    one_driver.quit()
 
