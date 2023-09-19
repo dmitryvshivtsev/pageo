@@ -26,8 +26,8 @@ class AbstractLocator(ABC):
 
     def __get__(self, instance, owner=None):
         if self.is_many:
-            return instance.find_elements(self.by, self.selector, self.timeout)
-        return instance.find_element(self.by, self.selector, self.timeout)
+            return instance._find_elements(self.by, self.selector, self.timeout)
+        return instance._find_element(self.by, self.selector, self.timeout)
 
     def set_name(self, name):
         self.name = name

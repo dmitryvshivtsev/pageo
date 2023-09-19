@@ -98,7 +98,7 @@ class BasePage(metaclass=MetaBasePage):
                f'window_size={(self.screen_width, self.screen_height)}, ' \
                f'url_suffix="{self.url_suffix}")'
 
-    def find_element(self, by: str, selector: str, duration: int = 5) -> WebElement:
+    def _find_element(self, by: str, selector: str, duration: int = 5) -> WebElement:
         """
         Метод, для поиска элемента на странице, с использованием явного ожидания.
         :param by: Стратегия для поиска элемента.
@@ -110,7 +110,7 @@ class BasePage(metaclass=MetaBasePage):
         return WebDriverWait(self.driver, duration).until(EC.presence_of_element_located((by, selector)),
                                                           message=f"Не найден элемент со стратегией локатора {by} и с селектором {selector}")
 
-    def find_elements(self, by: str, selector: str, duration: int = 5) -> WebElement:
+    def _find_elements(self, by: str, selector: str, duration: int = 5) -> WebElement:
         """
         Метод, для поиска элементов на странице, с использованием явного ожидания.
         :param by: Стратегия для поиска элементов.
@@ -121,6 +121,9 @@ class BasePage(metaclass=MetaBasePage):
         """
         return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located((by, selector)),
                                                           message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
+
+    def find_elements(self, locator: str):
+        return [self.get_locator(locator)]
 
     def open(self) -> None:
         """
