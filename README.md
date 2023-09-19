@@ -11,22 +11,22 @@
 
 Библиотека на базе Selenium с расширенным функционалом. Предназначена для автоматической работы с любыми веб-страницами и их элементами. 
 Вдохновлена [статьёй на Хабре](https://habr.com/ru/articles/472156/) и упрощает написание автоматических тестов 
-с реализацией паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject). Ускорьте написание кода, а также сделайте его лаконичнее и яснее.
+с реализацией паттерна [PageObject](https://ru.wikipedia.org/wiki/PageObject). Ускорьте написание кода и упростите его дальнейшую поддержку.
 
 ## Описание
 
-Зачем нужна эта библиотека, если есть Selenium из коробки, который и предоставляет методы для работы со страницами веб-сайтов?
+Зачем нужна эта библиотека, если Selenium из коробки предоставляет инструменты для работы со страницами веб-сайтов? 
 В процессе написания тестов, разработчик регулярно ищет элементы на странице, переходит на другие страницы,
-получает аттрибуты и т.д.. Все это, как правило, оборачивается в ожидания, чтобы избежать внезапных ошибок.
-Библиотека предоставляет базовый класс, методы которого позволяют скрыть часть этой логики, а также комбинируют в себе
+получает аттрибуты и т.д.. Все оборачивается в ожидания, чтобы избежать внезапных ошибок.
+Библиотека предоставляет базовый класс, методы которого позволяют скрыть часть этой логики и комбинируют в себе
 различные инструменты базового Selenium, тем самым расширяя функциональность.
 Благодаря этому ускоряется написание тестов, их понимание и последующая поддержка. 
 
 Преимущества перед использованием Selenium из коробки:
-- Простое использование путем наследования от базового класса в классы конкретных страниц.
-- Возможность установить настройки для теста, просто передав их в аргументах класса страницы.
-- Базовые [методы](#документация-базового-класса) поиска элементов расширены и включают в себя явное ожидание.
-- [Классы локаторов](#классы-локаторов), скрывающие логику поиска элементов и возвращающие объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
+- **[Простое использование](#создание-объекта)**. Чтобы начать пользоваться просто отнаследуйтесь от базового класса.
+- **Быстрая [настройка тестов](#создание-объекта)**. Установите настройки теста, просто передав их в аргументах класса страницы.
+- **Расширенные [методы поиска](#метод-findelement)**. Поиск элементов уже включает в себя явное ожидание.
+- **[Классы локаторов](#классы-локаторов)**. Эти классы скрывают логику поиска элементов и возвращают объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
 
 ##  Оглавление
 
@@ -85,7 +85,7 @@ class AboutPage(BasePage):
         return True if self.search_field_element else False
 ```
 
-Далее, можем создать экземпляр нашего класса `AboutPage` в тест-кейсе и при необходимости передать определенные [настройки](#создание-объекта).
+Теперь создаем экземпляр класса `AboutPage` в тесте и передаем некоторые [настройки](#создание-объекта).
 
 ```python
 # test_about_page.py
@@ -96,7 +96,7 @@ from about_page import AboutPage
 
 
 def test_search_field_exist():
-    page = AboutPage(driver=webdriver.Chrome())
+    page = AboutPage(driver=webdriver.Chrome(), window_size=(1600, 900))
 
     search_field_exist = page.is_search_field()
     assert search_field_exist
@@ -130,7 +130,7 @@ class SomePage(BasePage):
 ```
 
 
-Аргументы класса:
+**Аргументы класса:**
 - **driver** - объект `WebDriver`. Обязательный аргумент.
 - **base_url** - адрес страницы без относительного пути. По умолчанию None. Необязательный аргумент.
   > - Передавайте URL в аргументах при создании объекта только в том случае, если адрес не был указан в аттрибутах класса страницы. 
@@ -145,7 +145,7 @@ class SomePage(BasePage):
   > - Если относительный путь был указан и в аттрибутах класса, и в аргументах при создании объекта, но они отличаются, то будет выброшено исключение **UrlDisparityError**.
 
 - **window_size** - размер страницы браузера в формате `(ширина, высота)`. По умолчанию установлено значение (1920, 1080). Необязательный аргумент.
-- **cookie** - куки, которые необходимо передать перед открытием страницы. Необязательный аргумент.
+- **cookies** - список с cookie, которые необходимо передать перед открытием страницы. По умолчанию None. Необязательный аргумент.
 
 **Рекомендуется предварительно создавать свой объект `WebDriver`.**\
 Для примера создадим свой объект `WebDriver` и передадим ему опции:
@@ -190,9 +190,9 @@ from page_objects.main_page import MainPage
 
 
 def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-      
-    element = page.find_element(By.ID, 'about-link')
+  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+
+  element = page._find_element(By.ID, 'about-link')
 ```
 
 ### Метод find_elements
@@ -213,9 +213,9 @@ from page_objects.main_page import MainPage
 
 
 def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-  
-    element = page.find_elements(By.ID, 'nav-list')
+  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+
+  element = page._find_elements(By.ID, 'nav-list')
 ```
 
 ### Метод custom_wait_until
@@ -234,12 +234,12 @@ from page_objects.main_page import MainPage
 
 
 def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-  
-    page.find_element(By.ID, 'about-link').click()
-    page.custom_wait_until(lambda browser: browser.current_url != page.url)
+  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
 
-    ...
+  page._find_element(By.ID, 'about-link').click()
+  page.custom_wait_until(lambda browser: browser.current_url != page.url)
+
+  ...
 ```
 
 ### Метод move_to_element
@@ -257,12 +257,12 @@ from page_objects.main_page import MainPage
 
 
 def test_some_element():
-    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-  
-    about_button = page.find_element(By.ID, 'about-link')
-    page.move_to_element(about_button)
-    
-    ...
+  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+
+  about_button = page._find_element(By.ID, 'about-link')
+  page.move_to_element(about_button)
+
+  ...
 ```
 
 ## Классы локаторов
