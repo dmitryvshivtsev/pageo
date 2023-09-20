@@ -123,7 +123,8 @@ class BasePage(metaclass=MetaBasePage):
                                                           message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
 
     def find_elements(self, locator: str):
-        return [self.get_locator(locator)]
+        data = self.locators[locator]
+        return data if isinstance(data, list) else [data]
 
     def open(self) -> None:
         """
