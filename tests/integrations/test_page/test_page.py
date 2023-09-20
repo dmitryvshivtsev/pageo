@@ -24,3 +24,13 @@ class TestPage(BasePage):
         actual_paragraphs = self.paragraph_elements
         actual_paragraph_texts = [paragraph.text for paragraph in actual_paragraphs]
         return actual_paragraph_texts
+
+    def get_caption_text_list(self) -> list:
+        """ Возвращает текст элемента caption_element. """
+        return self.find_elements('caption_element')
+
+    def get_paragraph_texts_list(self) -> list:
+        """ Возвращает список, содержащий тексты всех найденных элементов из paragraph_elements. """
+        actual_paragraphs = self.find_elements('paragraph_elements')
+        actual_paragraph_texts = [paragraph.text for paragraph in actual_paragraphs]
+        return actual_paragraph_texts

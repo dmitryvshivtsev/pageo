@@ -293,6 +293,30 @@ def test_move_to_element(mock_move_to_element, base_page):
     mock_move_to_element.assert_called_once()
 
 
+def test_find_elements_with_single_element():
+    """
+    Тест проверяет, что метод find_elements() возвращает список из одного объекта WebElement.
+    """
+    mock_instance = Mock()
+    mock_instance.find_elements.return_value = ["element"]
+    locator = IdLocator("selector")
+    result = mock_instance.find_elements('locator')
+    assert result == ["element"]
+    mock_instance.find_elements.assert_called_with('locator')
+
+
+def test_find_elements_with_multiple_elements():
+    """
+    Тест проверяет, что метод find_elements() возвращает список из нескольких объектов WebElement.
+    """
+    mock_instance = Mock()
+    mock_instance.find_elements.return_value = ["element1", "element2"]
+    locator = IdLocator("selector")
+    result = mock_instance.find_elements('locator')
+    assert result == ["element1", "element2"]
+    mock_instance.find_elements.assert_called_with('locator')
+
+
 def test_class_locator_with_single_element():
     """
     Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_element().
@@ -303,18 +327,6 @@ def test_class_locator_with_single_element():
     result = locator.__get__(mock_instance)
     assert result == "element"
     mock_instance._find_element.assert_called_with(locator.by, locator.selector, locator.timeout)
-
-
-def test_find_elements_list():
-    """
-    Тест проверяет, что класс локатора работает корректно и вызывает внутри себя find_element().
-    """
-    mock_instance = Mock()
-    mock_instance.find_elements.return_value = ["element"]
-    locator = IdLocator("selector")
-    result = mock_instance.find_elements(locator)
-    assert result == ["element"]
-    mock_instance.find_elements.assert_called_with(locator)
 
 
 def test_class_locator_with_multiple_elements():
