@@ -25,8 +25,8 @@
 Преимущества перед использованием Selenium из коробки:
 - **[Простое использование](#создание-объекта)**. Чтобы начать пользоваться просто отнаследуйтесь от базового класса.
 - **Быстрая [настройка тестов](#создание-объекта)**. Установите настройки теста, просто передав их в аргументах класса страницы.
-- **Расширенные [методы поиска](#метод-findelement)**. Поиск элементов уже включает в себя явное ожидание.
 - **[Классы локаторов](#классы-локаторов)**. Эти классы скрывают логику поиска элементов и возвращают объект [`WebDriver`](https://www.selenium.dev/documentation/webdriver/drivers/service/).
+- **Быстрое использование [Page Object](#использование-в-pageobject)**. Легко создавать тесы используя паттерн Page Object.
 
 ##  Оглавление
 
@@ -34,7 +34,6 @@
 - [Быстрый старт](#быстрый-старт)
 - [Документация базового класса](#документация-базового-класса)
   - [Создание объекта](#создание-объекта)
-  - [Метод find_element](#метод-findelement)
   - [Метод find_elements](#метод-findelements)
   - [Метод custom_wait_until](#метод-customwaituntil)
   - [Метод move_to_element](#метод-movetoelement)
@@ -92,7 +91,7 @@ class AboutPage(BasePage):
 
 from selenium import webdriver
 
-from about_page import AboutPage
+from page_object.about_page import AboutPage
 
 
 def test_search_field_exist():
@@ -152,7 +151,7 @@ class SomePage(BasePage):
 ```python
 from selenium import webdriver
   
-from main_page import MainPage
+from page_object.main_page import MainPage
     
   
 options = webdriver.ChromeOptions()
@@ -167,55 +166,34 @@ page = MainPage(driver=driver, base_url='https://google.com')
 ```python
 from selenium import webdriver
   
-from main_page import MainPage
+from page_object.main_page import MainPage
 
 
 page = MainPage(driver=webdriver.Chrome(), base_url='https://google.com')
 ```
 
-### Метод find_element
-
-Метод `find_element` ищет элемент на странице по [локатору](https://www.selenium.dev/documentation/webdriver/elements/locators/) в течение определенного времени. Если элемент найден, то возвращает его.
-Иначе выбрасывает TimeoutException.
-
-Принимает следующие аргументы:
-- by - [Стратегия для поиска элемента](https://www.selenium.dev/documentation/webdriver/elements/locators/). Обязательный аргумент.
-- selector - [Селектор элемента, который необходимо найти](https://www.selenium.dev/documentation/webdriver/elements/finders/). Обязательный аргумент.
-- duration - время в секундах, в течение которого будет осуществляться поиск элемента. Значение по умолчанию - 5 секунд.
-
-```python
-from selenium.webdriver.common.by import By
-
-from page_objects.main_page import MainPage
-
-
-def test_some_element():
-  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-
-  element = page._find_element(By.ID, 'about-link')
-```
 
 ### Метод find_elements
 
-Метод `find_element` ищет все элементы на странице по [локатору](https://www.selenium.dev/documentation/webdriver/elements/locators/) 
-в течение определенного времени. Если элементы найдены, то возвращает список из этих элементов.
-Иначе выбрасывает TimeoutException.
+Метод `find_elements` возвращает элементы, которые были найдены [классом локатора](#классы-локаторов), в виде списка.
+Будет возвращен список, даже если был найден только один элемент.
+
 
 Принимает следующие аргументы:
-- by - [Стратегия для поиска элементов](https://www.selenium.dev/documentation/webdriver/elements/locators/). Обязательный аргумент.
-- selector - [Селектор элементов, которые необходимо найти](https://www.selenium.dev/documentation/webdriver/elements/finders/). Обязательный аргумент.
-- duration - время в секундах, в течение которого будет осуществляться поиск элементов. Значение по умолчанию - 5 секунд.
+- locator - строка, которая содержит имя переменной, хранящей объект локатора. 
 
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects.main_page import MainPage
+from page_object.main_page import MainPage
 
 
 def test_some_element():
-  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
-
-  element = page._find_elements(By.ID, 'nav-list')
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    
+    element = page.find_elements('some_locator_name')
+    
+    ...
 ```
 
 ### Метод custom_wait_until
@@ -230,16 +208,16 @@ def test_some_element():
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects.main_page import MainPage
+from page_object.main_page import MainPage
 
 
 def test_some_element():
-  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
 
-  page._find_element(By.ID, 'about-link').click()
-  page.custom_wait_until(lambda browser: browser.current_url != page.url)
+    page._find_element(By.ID, 'about-link').click()
+    page.custom_wait_until(lambda browser: browser.current_url != page.url)
 
-  ...
+    ...
 ```
 
 ### Метод move_to_element
@@ -253,16 +231,16 @@ def test_some_element():
 ```python
 from selenium.webdriver.common.by import By
 
-from page_objects.main_page import MainPage
+from page_object.main_page import MainPage
 
 
 def test_some_element():
-  page = MainPage(base_url='https://google.com', url_suffix='/doodles')
+    page = MainPage(base_url='https://google.com', url_suffix='/doodles')
 
-  about_button = page._find_element(By.ID, 'about-link')
-  page.move_to_element(about_button)
+    about_button = page._find_element(By.ID, 'about-link')
+    page.move_to_element(about_button)
 
-  ...
+    ...
 ```
 
 ## Классы локаторов
