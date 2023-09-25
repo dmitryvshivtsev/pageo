@@ -180,11 +180,9 @@ page = MainPage(driver=webdriver.Chrome(), base_url='https://google.com')
 
 
 Принимает следующие аргументы:
-- locator - строка, которая содержит имя переменной, хранящей объект локатора. 
+- locator - строка, которая содержит имя переменной локатора, хранящей веб-элемент. 
 
 ```python
-from selenium.webdriver.common.by import By
-
 from page_object.main_page import MainPage
 
 
@@ -206,7 +204,7 @@ def test_some_element():
 - duration - время в секундах, в течение которого будет выполняться ожидание.
 
 ```python
-from selenium.webdriver.common.by import By
+from pageo import IdLocator
 
 from page_object.main_page import MainPage
 
@@ -214,8 +212,9 @@ from page_object.main_page import MainPage
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
 
-    page._find_element(By.ID, 'about-link').click()
-    page.custom_wait_until(lambda browser: browser.current_url != page.url)
+    link_button = IdLocator('about-link')
+    link_button.click()
+    page.custom_wait_until(lambda driver: driver.current_url != page.url)
 
     ...
 ```
@@ -229,7 +228,7 @@ def test_some_element():
 - element - объект `WebElement`, на который нужно выполнить наведение мыши.
 
 ```python
-from selenium.webdriver.common.by import By
+from pageo import IdLocator
 
 from page_object.main_page import MainPage
 
@@ -237,7 +236,7 @@ from page_object.main_page import MainPage
 def test_some_element():
     page = MainPage(base_url='https://google.com', url_suffix='/doodles')
 
-    about_button = page._find_element(By.ID, 'about-link')
+    about_button = IdLocator('about-link')
     page.move_to_element(about_button)
 
     ...
