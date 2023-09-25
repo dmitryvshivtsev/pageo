@@ -122,7 +122,7 @@ class BasePage(metaclass=MetaBasePage):
         return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located((by, selector)),
                                                           message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
 
-    def find_elements(self, locator):
+    def find_elements(self, locator: str):
         data = self.locators[locator]
         return data if isinstance(data, list) else [data]
 
