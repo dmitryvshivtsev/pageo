@@ -39,7 +39,7 @@ class BasePage(metaclass=MetaBasePage):
         :param base_url: Базовый url страницы.
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
-        :param cookie: Куки, которые необходимо установить.
+        :param cookies: Куки, которые необходимо установить.
         """
 
         if self.base_url is None and base_url is None:
@@ -105,7 +105,7 @@ class BasePage(metaclass=MetaBasePage):
         :param selector: Селектор элемента, который необходимо найти.
         :param duration: Время, в течение которого будет ожидаться появление элемента. По умолчанию 5 секунд.
         :return: Объект WebElement, если элемент найден на странице.
-        Иначе, возвращает TimeoutException с дополнительным сообщением.
+        Иначе, поднимается TimeoutException с дополнительным сообщением.
         """
         return WebDriverWait(self.driver, duration).until(EC.presence_of_element_located((by, selector)),
                                                           message=f"Не найден элемент со стратегией локатора {by} и с селектором {selector}")
@@ -117,12 +117,12 @@ class BasePage(metaclass=MetaBasePage):
         :param selector: Селектор элементов, которые необходимо найти.
         :param duration: Время, в течение которого будет ожидаться появление элементов. По умолчанию 5 секунд.
         :return: Список объектов WebElement, если элементы найдены на странице.
-        Иначе, возвращает TimeoutException с дополнительным сообщением.
+        Иначе, поднимается TimeoutException с дополнительным сообщением.
         """
         return WebDriverWait(self.driver, duration).until(EC.presence_of_all_elements_located((by, selector)),
                                                           message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
 
-    def find_elements(self, locator: str):
+    def find_elements(self, locator):
         data = self.locators[locator]
         return data if isinstance(data, list) else [data]
 
