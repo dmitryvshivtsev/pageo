@@ -28,7 +28,7 @@ def chrome_options():
     Возвращает объект Options.
     """
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless=new')
+    options.add_argument('--headless')
     return options
 
 
