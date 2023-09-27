@@ -40,5 +40,5 @@ def driver(chrome_options):
     """
     one_driver = webdriver.Chrome(chrome_options)
     yield one_driver
-    # one_driver.quit()
+    one_driver.quit()
 
