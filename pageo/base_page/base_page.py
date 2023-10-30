@@ -1,4 +1,4 @@
-from typing import Callable, List, Any, Dict
+from typing import Callable, List, Any, Dict, Literal
 from urllib.parse import urljoin
 
 from selenium import webdriver
@@ -124,8 +124,11 @@ class BasePage(metaclass=MetaBasePage):
                                                           message=f"Не найдены элементы со стратегией локатора {by} и с селектором {selector}")
 
     def find_elements(self, locator: str):
-        data = self.locators[locator]
-        return data if isinstance(data, list) else [data]
+        """
+        Метод возвращает список из объектов класса WebElement, даже если был найден только один элемент.
+        """
+        elements = self.locators[locator]
+        return elements if isinstance(elements, list) else [elements]
 
     def open(self) -> None:
         """
@@ -149,41 +152,11 @@ class BasePage(metaclass=MetaBasePage):
         """
         WebDriverWait(self.driver, duration).until(func_condition)
 
-    def move_to_element(self, element: WebElement, is_click: bool = False) -> None:
+    def move_to_element(self, element: WebElement) -> None:
         """
         Метод имитирует наведение мыши на элемент.
-        При необходимости можно кликнуть левой кнопкой мыши на элемент.
 
-        :param element: Объект класса WebElement.
-        :param is_click: Булевое значение, указывающее на необходимость кликнуть на элемент после наведения на него.
+        :param element: Объект класса WebElement, на который нужно навести курсор.
         """
-        action = ActionChains(self.driver).move_to_element(element)
-        action.perform() if not is_click else action.click().perform()
-
-    def move_by_offset_and_click(self, xoffset: int, yoffset: int, is_click: bool = False):
-        """
-        Метод имитирует наведение мыши на точку заданную конкретными координатами.
-        При необходимости можно кликнуть левой кнопкой мыши в точке расположения курсора после наведения.
-
-        :param xoffset: Указывает координату перемещения мыши по оси X. Положительное целое число.
-        :param yoffset: Указывает координату перемещения мыши по оси Y. Положительное целое число.
-        :param is_click: Булевое значение, указывающее на необходимость кликнуть на элемент после наведения на него.
-        """
-        action = ActionChains(self.driver).move_by_offset(xoffset, yoffset)
-        action.perform() if not is_click else action.click().perform()
-
-    def get_attribute_from_path(self, element: WebElement, attribute: str) -> str:
-        """
-        У элементов с тэгом <svg> есть вложенный тэг <path>. Этот тэг является общим элементом для описания фигуры.
-        Подробнее про <path> можно прочитать здесь: "https://developer.mozilla.org/ru/docs/Web/SVG/Element/path"
-        При работе с SVG элементами часто требуется доступ к атрибутам тэга <path>.
-        Метод позволяет получить любой атрибут тэга передав в него объект класса WebElement, содерждащего SVG или сам PATH.
-
-        :param element: Объект класса WebElement. Должен содержать элемент SVG или PATH.
-        :param attribute: Атрибут, который необходимо получить из тэга <path>
-        """
-        if element.tag_name == 'svg':
-            element = element.find_element(By.TAG_NAME, "path")
-        return element.get_attribute(attribute)
-
-
+        action = ActionChains(self.driver)
+        action.move_to_element(element).perform()
