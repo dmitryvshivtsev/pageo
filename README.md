@@ -246,17 +246,44 @@ def test_some_element():
 
 Вспомогательные классы локаторов для `BasePage`, инкапсулирующие логику поиска элементов по локаторам.
 Каждый класс наследуется от абстрактного класса `AbstractLocator`.
-Использование классов локаторов позволяет объявлять их в классах страницы как атрибуты класса. Если селектор изменится 
+Использование классов локаторов позволяет создавать их экземпляры в классах страницы как атрибуты класса. Если селектор изменится 
 или нужно изменить стратегию поиска элемента, то достаточно просто изменить селектор элемента в аргументах класса или сам класс-стратегию.
 
 Каждый класс локатора принимает следующие аргументы:
-- selector - селектор искомого элемента. **Обязательный аргумент.**
-- is_many - флаг, указывающий на множественность элементов. \
+- **selector** - селектор искомого элемента. **Обязательный аргумент.**
+- **is_many** - флаг, указывающий на множественность элементов. \
 Если **False**, то будет возвращен один найденный элемент (первый элемент, который соответствует локатору). \
 Если **True**, то будет возвращен список всех найденных элементов.
-- timeout - время в секундах, в течение которого будет выполняться ожидание. По умолчанию 5 секунд.
+- **timeout** - время в секундах, в течение которого будет выполняться ожидание. По умолчанию 5 секунд.
 
 Каждый класс локатора возвращает объект `WebElement`.
+
+Пример использования класса локатора для поиска одного элемента:
+```python
+from pageo import BasePage
+from pageo import ClassNameLocator
+
+
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = ClassNameLocator("cardlink", timeout=3)
+```
+Если элементов много и нужны все:
+```python
+from pageo import BasePage
+from pageo import ClassNameLocator
+
+
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_elements = ClassNameLocator("cardlink", is_many=True, timeout=6)
+```
+
+Далее подробней описаны все доступные классы локаторов.
 
 ### class_name_locator
 
@@ -264,13 +291,14 @@ def test_some_element():
 
 ```python
 from pageo import BasePage
-from pageo import ClassNameLocator 
+from pageo import ClassNameLocator
 
 
-class SomePage(BasePage):
-    some_element = ClassNameLocator("some-class-name")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = ClassNameLocator("cardlink")
 ```
 
 ### css_locator
@@ -282,10 +310,11 @@ from pageo import BasePage
 from pageo import CSSLocator
 
 
-class SomePage(BasePage):
-    some_element = CSSLocator("some-css-locator")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = CSSLocator("#latest-title")
 ```
 
 ### id_locator
@@ -297,10 +326,11 @@ from pageo import BasePage
 from pageo import IdLocator
 
 
-class SomePage(BasePage):
-    some_element = IdLocator("some-id-attribute")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = IdLocator("highlight")
 ```
 
 ### link_text_locator
@@ -312,10 +342,11 @@ from pageo import BasePage
 from pageo import LinkTextLocator
 
 
-class SomePage(BasePage):
-    some_element = LinkTextLocator("some-link-text")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = LinkTextLocator("Подробности")
 ```
 
 ### name_locator
@@ -327,10 +358,11 @@ from pageo import BasePage
 from pageo import NameLocator
 
 
-class SomePage(BasePage):
-    some_element = NameLocator("some-name-attribute")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = NameLocator("q")
 ```
 
 ### partial_link_text_locator
@@ -342,10 +374,11 @@ from pageo import BasePage
 from pageo import PartialLinkTextLocator
 
 
-class SomePage(BasePage):
-    some_element = PartialLinkTextLocator("some-partial-link-text")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = PartialLinkTextLocator("Подробности")
 ```
 
 ### tag_name_locator
@@ -357,10 +390,11 @@ from pageo import BasePage
 from pageo import TagNameLocator
 
 
-class SomePage(BasePage):
-    some_element = TagNameLocator("some-tag-name")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = TagNameLocator("input")
 ```
 
 ### xpath_locator
@@ -372,10 +406,11 @@ from pageo import BasePage
 from pageo import XPATHLocator
 
 
-class SomePage(BasePage):
-    some_element = XPATHLocator("some-xpath")
-
-    ...
+class DoodlesPage(BasePage):
+    base_url = "http://google.com"
+    url_suffix = "doodles"
+    
+    some_element = XPATHLocator("//*[@id='searchinput'']")
 ```
 
 ## Использование в [PageObject](https://ru.wikipedia.org/wiki/PageObject)
