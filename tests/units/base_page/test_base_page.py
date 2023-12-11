@@ -146,8 +146,8 @@ def test_inherited_base_page_with_the_same_name():
             pass
 
 
-@pytest.fixture
-def base_page():
+@pytest.fixture(scope="module")
+def some_page():
     """
     Фикстура, возвращающая экземпляр класса страницы и устанавливающая необходимые настройки драйвера.
     """
@@ -155,29 +155,38 @@ def base_page():
     url_suffix = "/test"
     window_size = (1920, 1080)
 
-    return BasePage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
+    class SomeTestPage(BasePage):
+        pass
+
+    return SomeTestPage(driver=driver, base_url=base_url_test, window_size=window_size, url_suffix=url_suffix)
 
 
-def test_init(base_page):
+def test_init(some_page):
     """
     Тест проверяет, что объект был создан корректно и аттрибуты объекта соответствуют ожидаемым.
     """
-    assert base_page.driver is not None
-    assert base_page.base_url == get_base_url_with_protocol(base_url_test)
-    assert base_page.url_suffix == "/test"
-    assert base_page.url == urljoin(base_page.base_url, base_page.url_suffix)
-    base_page.driver.set_window_size.assert_called_once_with(1920, 1080)
+    assert some_page.driver is not None
+    assert some_page.base_url == get_base_url_with_protocol(base_url_test)
+    assert some_page.url_suffix == "/test"
+    assert some_page.url == urljoin(some_page.base_url, some_page.url_suffix)
+    some_page.driver.set_window_size.assert_called_once_with(1920, 1080)
 
 
-def test_open(base_page):
+def test_open(some_page):
     """
     Тест проверяет, что метод перехода на страницу сайта вызывается с верными параметрами внутри конструктора.
     """
-    base_page.driver.get.assert_called_once_with(base_page.url)
+    some_page.driver.get.assert_called_once_with(some_page.url)
+
+
+def test_add_locators(some_page):
+    some_page.add_locators(some_locator_1="val_1", some_locator_2="val_2")
+    assert some_page.some_locator_1 == "val_1"
+    assert some_page.some_locator_2 == "val_2"
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_element(mock_until, base_page):
+def test_find_element(mock_until, some_page):
     """
     Тест проверяет, что метод find_element() работает корректно и внутри него срабатывает явное ожидание.
     """
@@ -185,14 +194,14 @@ def test_find_element(mock_until, base_page):
     mock_element = Mock()
     mock_until.return_value = mock_element
 
-    element = base_page._find_element(*locator)
+    element = some_page._find_element(*locator)
 
     mock_until.assert_called_once()
     assert element == mock_element
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_element_timeout_exception(mock_until, base_page):
+def test_find_element_timeout_exception(mock_until, some_page):
     """
     Тест проверяет, что метод find_element() выбрасывает исключение, если элемент не найден.
     """
@@ -200,11 +209,11 @@ def test_find_element_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page._find_element(*locator)
+        some_page._find_element(*locator)
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_element_type_exception(mock_until, base_page):
+def test_find_element_type_exception(mock_until, some_page):
     """
     Тест проверяет, что метод find_element() выбрасывает исключение, если переданы неверные аргументы.
     """
@@ -212,11 +221,11 @@ def test_find_element_type_exception(mock_until, base_page):
     mock_until.side_effect = TypeError("Invalid argument")
 
     with pytest.raises(TypeError):
-        base_page._find_element(locator)
+        some_page._find_element(locator)
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_elements(mock_until, base_page):
+def test_find_elements(mock_until, some_page):
     """
     Тест проверяет, что метод find_elements() работает корректно и внутри него срабатывает явное ожидание.
     """
@@ -224,14 +233,14 @@ def test_find_elements(mock_until, base_page):
     mock_elements = [Mock(), Mock()]
     mock_until.return_value = mock_elements
 
-    elements = base_page._find_elements(*locator)
+    elements = some_page._find_elements(*locator)
 
     mock_until.assert_called_once()
     assert elements == mock_elements
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_elements_timeout_exception(mock_until, base_page):
+def test_find_elements_timeout_exception(mock_until, some_page):
     """
     Тест проверяет, что метод find_elements() выбрасывает исключение, если элемент не найден.
     """
@@ -239,13 +248,13 @@ def test_find_elements_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page._find_elements(*locator)
+        some_page._find_elements(*locator)
 
     mock_until.assert_called_once()
 
 
 @patch.object(WebDriverWait, 'until')
-def test_find_elements_type_exception(mock_until, base_page):
+def test_find_elements_type_exception(mock_until, some_page):
     """
     Тест проверяет, что метод find_elements() выбрасывает исключение, если переданы неверные аргументы.
     """
@@ -253,24 +262,24 @@ def test_find_elements_type_exception(mock_until, base_page):
     mock_until.side_effect = TypeError("Invalid argument")
 
     with pytest.raises(TypeError):
-        base_page._find_elements(locator)
+        some_page._find_elements(locator)
 
 
 @patch.object(WebDriverWait, 'until')
-def test_custom_wait_until(mock_until, base_page):
+def test_custom_wait_until(mock_until, some_page):
     """
     Тест проверяет, что метод custom_wait_until() вызывает явное ожидание до тех пор, пока не будет выполнено условие.
     """
     condition = Mock()
     mock_until.return_value = condition
 
-    base_page.custom_wait_until(condition)
+    some_page.custom_wait_until(condition)
 
     mock_until.assert_called_once()
 
 
 @patch.object(WebDriverWait, 'until')
-def test_custom_wait_until_timeout_exception(mock_until, base_page):
+def test_custom_wait_until_timeout_exception(mock_until, some_page):
     """
     Тест проверяет, что в случае невыполнения условия в течение заданного времени, метод
     custom_wait_until() выбрасывает исключение TimeoutException.
@@ -278,18 +287,18 @@ def test_custom_wait_until_timeout_exception(mock_until, base_page):
     mock_until.side_effect = TimeoutException("Element not found")
 
     with pytest.raises(TimeoutException):
-        base_page._find_elements('', '')
+        some_page._find_elements('', '')
 
     mock_until.assert_called_once()
 
 
 @patch.object(ActionChains, 'move_to_element')
-def test_move_to_element(mock_move_to_element, base_page):
+def test_move_to_element(mock_move_to_element, some_page):
     """
     Тест проверяет, что метод работает корректно и наведение мыши на элемент действительно происходит.
     """
     element = MagicMock()
-    base_page.move_to_element(element)
+    some_page.move_to_element(element)
     mock_move_to_element.assert_called_once()
 
 
