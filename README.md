@@ -34,9 +34,9 @@
 - [Быстрый старт](#быстрый-старт)
 - [Документация базового класса](#документация-базового-класса)
   - [Создание объекта](#создание-объекта)
-  - [Метод find_elements](#метод-findelements)
+  - [Метод find_elements](#метод-find_elements)
   - [Метод custom_wait_until](#метод-customwaituntil)
-  - [Метод move_to_element](#метод-movetoelement)
+  - [Метод move_to_element](#метод-move-to-element)
 - [Классы локаторов](#классы-локаторов)
   - [class_name_locator](#classnamelocator)
   - [css_locator](#csslocator)
@@ -46,6 +46,7 @@
   - [partial_link_text_locator](#partiallinktextlocator)
   - [tag_name_locator](#tagnamelocator)
   - [xpath_locator](#xpathlocator)
+- [Динамическое добавление локаторов](#динамическое-добавление-локаторов)
 - [Использование в PageObject](#использование-в-pageobject)
 
 
@@ -412,6 +413,29 @@ class DoodlesPage(BasePage):
     
     some_element = XPATHLocator("//*[@id='searchinput'']")
 ```
+
+## Динамическое добавление локаторов
+
+Может возникнуть ситуация, когда необходимо добавить новые локаторы в класс в самом тесте или в методах класса. \
+Например, нам нужно автоматически пройти тестирование. Варианты ответа на вопрос расположены вразброс:
+
+```python
+from pageo import BasePage
+from pageo import XPATHLocator
+
+
+class ExamPage(BasePage):
+    pass
+    
+    def pass_exam(self):
+      for _ in range(10):
+          self.add_locators(
+              answer_text=XPATHLocator(f"//*[text()='{answer}']"),
+          )
+          self.answer_text.click()
+```
+Такой способ добавления локаторов в класс страницы может быть полезен, когда нужный элемент может меняться и из-за этого необходимо изменять локатор.
+
 
 ## Использование в [PageObject](https://ru.wikipedia.org/wiki/PageObject)
 
