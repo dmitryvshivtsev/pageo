@@ -87,6 +87,11 @@ class BasePage(metaclass=MetaBasePage):
     def get_inherited_classes(cls) -> List['BasePage']:
         return list(cls.__dict__.get('inherited_classes', {}).values())
 
+    @classmethod
+    def add_locators(cls, **locators) -> None:
+        for name, locator in locators.items():
+            setattr(cls, name, locator)
+
     def get_locator(self, name: str) -> WebElement:
         return self.locators[name]
 
