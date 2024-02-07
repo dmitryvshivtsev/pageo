@@ -445,7 +445,7 @@ def test_is_open_page_true(mock_open_page):
     class SomePage_test_is_open_page_true(BasePage):
         base_url = 'https://some_url.com'
 
-    page = SomePage_test_is_open_page_true(driver=MockDriver(), is_open_page=True)
+    page = SomePage_test_is_open_page_true(driver=MockDriver(), is_open=True)
     mock_open_page.assert_called_once()
 
 
@@ -454,7 +454,7 @@ def test_is_open_page_false(mock_open_page):
     class SomePage_test_is_open_page_false(BasePage):
         base_url = 'https://some_url.com'
 
-    page = SomePage_test_is_open_page_false(driver=MockDriver(), is_open_page=False)
+    page = SomePage_test_is_open_page_false(driver=MockDriver(), is_open=False)
     mock_open_page.assert_not_called()
 
 

@@ -29,7 +29,7 @@ class BasePage(metaclass=MetaBasePage):
             url_suffix: str = None,
             window_size: tuple = (1920, 1080),
             cookies: list[dict[str, str]] = None,
-            is_open_page: bool = True,
+            is_open: bool = True,
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -41,7 +41,7 @@ class BasePage(metaclass=MetaBasePage):
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         :param cookies: Куки, которые необходимо установить.
-        :param is_open_page: Флаг, указывающий на необходимость открыть страницу сразу после создания объекта.
+        :param is_open: Флаг, указывающий на необходимость открыть страницу сразу после создания объекта.
         """
 
         if self.base_url is None and base_url is None:
@@ -70,7 +70,7 @@ class BasePage(metaclass=MetaBasePage):
                 self.driver.execute_cdp_cmd('Network.setCookie', cookie)
             self.driver.execute_cdp_cmd('Network.disable', {})
 
-        if is_open_page:
+        if is_open:
             self.open()
 
         mro_dicts = {}
