@@ -438,3 +438,23 @@ def test_url_suffix_class_attribute_but_base_url_arguments():
     assert page.base_url == 'https://some_url.com'
     assert page.url_suffix == '/some_page'
     assert page.url == 'https://some_url.com/some_page'
+
+
+@patch.object(BasePage, 'open')
+def test_is_open_page_true(mock_open_page):
+    class SomePage_test_is_open_page_true(BasePage):
+        base_url = 'https://some_url.com'
+
+    page = SomePage_test_is_open_page_true(driver=MockDriver(), is_open_page=True)
+    mock_open_page.assert_called_once()
+
+
+@patch.object(BasePage, 'open')
+def test_is_open_page_false(mock_open_page):
+    class SomePage_test_is_open_page_false(BasePage):
+        base_url = 'https://some_url.com'
+
+    page = SomePage_test_is_open_page_false(driver=MockDriver(), is_open_page=False)
+    mock_open_page.assert_not_called()
+
+

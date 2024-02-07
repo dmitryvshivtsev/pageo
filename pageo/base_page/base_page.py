@@ -1,9 +1,8 @@
-from typing import Callable, List, Any, Dict, Literal
+from typing import Callable, Any
 from urllib.parse import urljoin
 
 from selenium import webdriver
 from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -29,7 +28,8 @@ class BasePage(metaclass=MetaBasePage):
             base_url: str = None,
             url_suffix: str = None,
             window_size: tuple = (1920, 1080),
-            cookies: List[Dict[str, str]] = None,
+            cookies: list[dict[str, str]] = None,
+            is_open_page: bool = True,
     ):
         """
         Конструктор класса, выполняющий функцию установки различных настроек.
@@ -41,6 +41,7 @@ class BasePage(metaclass=MetaBasePage):
         :param url_suffix: Относительный путь к конкретной странице.
         :param window_size: Размер окна для тестирования на различных устройствах.
         :param cookies: Куки, которые необходимо установить.
+        :param is_open_page: Флаг, указывающий на необходимость открыть страницу сразу после создания объекта.
         """
 
         if self.base_url is None and base_url is None:
@@ -69,7 +70,8 @@ class BasePage(metaclass=MetaBasePage):
                 self.driver.execute_cdp_cmd('Network.setCookie', cookie)
             self.driver.execute_cdp_cmd('Network.disable', {})
 
-        self.open()
+        if is_open_page:
+            self.open()
 
         mro_dicts = {}
         for Class in reversed(type(self).__mro__):
@@ -84,7 +86,7 @@ class BasePage(metaclass=MetaBasePage):
                 value.set_name(name)
 
     @classmethod
-    def get_inherited_classes(cls) -> List['BasePage']:
+    def get_inherited_classes(cls) -> list['BasePage']:
         return list(cls.__dict__.get('inherited_classes', {}).values())
 
     @classmethod
@@ -143,13 +145,12 @@ class BasePage(metaclass=MetaBasePage):
 
     def custom_wait_until(self, func_condition: Callable[[], Any], duration: int = 5) -> None:
         """
-        Метод позволяет задавать ожидания на основе
-        пользовательских условий.
+        Метод позволяет задавать ожидания на основе пользовательских условий.
 
         В случае, когда условие ожидания, которое нам нужно, не предусмотрено selenium, пользователь
         может сам задать условие ожидания на основе какой-либо функции.
 
-        Например: lambda driver: driver.current_url != 'https://some_url.com' задаст следующие условие ожидания: ждем пока
+        Например: lambda driver: driver.current_url == 'https://some_url.com' задаст следующие условие ожидания: ждем пока
         текущий URL не станет равен ожидаемому.
 
         :param func_condition: Функция предикат, в которой задано условие ожидания.
